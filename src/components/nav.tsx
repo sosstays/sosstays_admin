@@ -5,6 +5,15 @@ import { usePathname } from "next/navigation"
 import { Home, Building2, Users, CalendarDays, Handshake, MessageSquare, LogOut } from "lucide-react"
 import { logout } from "@/lib/auth/actions"
 import { Logo } from "@/components/logo"
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar"
 
 const links = [
   { href: "/", label: "Dashboard", icon: Home },
@@ -19,45 +28,56 @@ export function Nav() {
   const pathname = usePathname()
 
   return (
-    <aside className="flex h-screen w-60 shrink-0 flex-col bg-[var(--forest)] px-4 py-6 text-[var(--cream)]">
-      <div className="flex items-center gap-2.5 px-2">
-        <Logo className="h-[17px] w-[26px] shrink-0" />
-        <div className="flex flex-col leading-tight">
-          <span className="font-heading text-base font-bold">SOS Stays</span>
-          <span className="text-[10.5px] uppercase tracking-wider opacity-65">Admin</span>
+    <Sidebar collapsible="icon" className="border-r-0">
+      <SidebarHeader>
+        <div className="flex items-center gap-2.5 px-1 py-1 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
+          <Logo className="h-[17px] w-[26px] shrink-0 text-[var(--cream)]" />
+          <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden">
+            <span className="font-heading text-base font-bold text-[var(--cream)]">
+              SOS Stays
+            </span>
+            <span className="text-[10.5px] uppercase tracking-wider text-[var(--cream)] opacity-65">
+              Admin
+            </span>
+          </div>
         </div>
-      </div>
+      </SidebarHeader>
 
-      <nav className="mt-8 flex flex-col gap-1">
-        {links.map((link) => {
-          const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href)
-          const Icon = link.icon
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={
-                isActive
-                  ? "flex items-center gap-2.5 rounded-lg bg-[var(--sage-300)] px-3.5 py-2.5 font-semibold text-[var(--forest-deep)]"
-                  : "flex items-center gap-2.5 rounded-lg px-3.5 py-2.5 text-[var(--cream)] opacity-[.82] transition-colors hover:bg-white/[0.08]"
-              }
-            >
-              <Icon className="h-[18px] w-[18px]" strokeWidth={1.9} />
-              {link.label}
-            </Link>
-          )
-        })}
-      </nav>
+      <SidebarContent>
+        <SidebarMenu className="gap-1 px-2">
+          {links.map((link) => {
+            const isActive =
+              link.href === "/" ? pathname === "/" : pathname.startsWith(link.href)
+            const Icon = link.icon
+            return (
+              <SidebarMenuItem key={link.href}>
+                <SidebarMenuButton
+                  isActive={isActive}
+                  tooltip={link.label}
+                  render={<Link href={link.href} />}
+                  className="text-[var(--cream)] data-[active=true]:font-semibold"
+                >
+                  <Icon strokeWidth={1.9} />
+                  <span>{link.label}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )
+          })}
+        </SidebarMenu>
+      </SidebarContent>
 
-      <form action={logout} className="mt-auto border-t border-white/15 pt-4">
-        <button
-          type="submit"
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/30 px-3.5 py-2 text-sm text-[var(--cream)] transition-colors hover:bg-white/[0.08]"
-        >
-          <LogOut className="h-4 w-4" strokeWidth={1.9} />
-          Log out
-        </button>
-      </form>
-    </aside>
+      <SidebarFooter>
+        <form action={logout}>
+          <SidebarMenuButton
+            tooltip="Log out"
+            render={<button type="submit" />}
+            className="justify-center border border-white/30 text-[var(--cream)]"
+          >
+            <LogOut strokeWidth={1.9} />
+            <span>Log out</span>
+          </SidebarMenuButton>
+        </form>
+      </SidebarFooter>
+    </Sidebar>
   )
 }

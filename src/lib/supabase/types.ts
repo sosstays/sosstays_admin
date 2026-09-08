@@ -103,6 +103,48 @@ export type Database = {
           },
         ]
       }
+      contact_queries: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          mailerlite_subscriber_id: string | null
+          mailerlite_synced_at: string | null
+          message: string | null
+          name: string | null
+          property_name: string | null
+          status: string
+          topic: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          mailerlite_subscriber_id?: string | null
+          mailerlite_synced_at?: string | null
+          message?: string | null
+          name?: string | null
+          property_name?: string | null
+          status?: string
+          topic?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          mailerlite_subscriber_id?: string | null
+          mailerlite_synced_at?: string | null
+          message?: string | null
+          name?: string | null
+          property_name?: string | null
+          status?: string
+          topic?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       guests: {
         Row: {
           auth_user_id: string | null
@@ -138,6 +180,101 @@ export type Database = {
           phone?: string | null
         }
         Relationships: []
+      }
+      landlord_leads: {
+        Row: {
+          adr: string | null
+          area: string | null
+          bedrooms: string | null
+          biggest_challenge: string | null
+          company: string | null
+          created_at: string
+          current_revenue: number | null
+          email: string
+          estimated_potential: number | null
+          estimated_uplift: number | null
+          hours_per_week: number | null
+          id: string
+          landlord_situation: string | null
+          mailerlite_subscriber_id: string | null
+          mailerlite_synced_at: string | null
+          name: string | null
+          num_properties: string | null
+          occupancy: string | null
+          phone: string | null
+          platforms: string | null
+          property_description: string | null
+          property_id: string | null
+          source: string | null
+          status: string
+          updated_at: string
+          uplift_percent: number | null
+        }
+        Insert: {
+          adr?: string | null
+          area?: string | null
+          bedrooms?: string | null
+          biggest_challenge?: string | null
+          company?: string | null
+          created_at?: string
+          current_revenue?: number | null
+          email: string
+          estimated_potential?: number | null
+          estimated_uplift?: number | null
+          hours_per_week?: number | null
+          id?: string
+          landlord_situation?: string | null
+          mailerlite_subscriber_id?: string | null
+          mailerlite_synced_at?: string | null
+          name?: string | null
+          num_properties?: string | null
+          occupancy?: string | null
+          phone?: string | null
+          platforms?: string | null
+          property_description?: string | null
+          property_id?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string
+          uplift_percent?: number | null
+        }
+        Update: {
+          adr?: string | null
+          area?: string | null
+          bedrooms?: string | null
+          biggest_challenge?: string | null
+          company?: string | null
+          created_at?: string
+          current_revenue?: number | null
+          email?: string
+          estimated_potential?: number | null
+          estimated_uplift?: number | null
+          hours_per_week?: number | null
+          id?: string
+          landlord_situation?: string | null
+          mailerlite_subscriber_id?: string | null
+          mailerlite_synced_at?: string | null
+          name?: string | null
+          num_properties?: string | null
+          occupancy?: string | null
+          phone?: string | null
+          platforms?: string | null
+          property_description?: string | null
+          property_id?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string
+          uplift_percent?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "landlord_leads_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       properties: {
         Row: {
@@ -279,6 +416,40 @@ export type TablesUpdate<
       }
       ? U
       : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {

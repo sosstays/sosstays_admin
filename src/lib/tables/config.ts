@@ -45,6 +45,12 @@ const properties: TableConfig = {
         "room_number",
       ],
     },
+    {
+      label: "Landlord leads",
+      sourceTable: "landlord_leads",
+      foreignKey: "property_id",
+      columns: ["name", "email", "status", "source", "created_at"],
+    },
   ],
 }
 
@@ -191,10 +197,172 @@ const bookings: TableConfig = {
   ],
 }
 
+const landlordLeads: TableConfig = {
+  key: "landlord_leads",
+  label: "Lead",
+  pluralLabel: "Landlord Leads",
+  route: "/leads",
+  primaryKey: "id",
+  listFields: ["name", "email", "phone", "status", "area", "current_revenue", "created_at"],
+  fields: [
+    { key: "id", label: "ID", type: "uuid", editable: false },
+    { key: "name", label: "Name", type: "text", editable: true },
+    { key: "email", label: "Email", type: "text", editable: true },
+    { key: "phone", label: "Phone", type: "text", editable: true },
+    { key: "company", label: "Company", type: "text", editable: true },
+    {
+      key: "status",
+      label: "Status",
+      type: "select",
+      editable: true,
+      options: ["new", "contacted", "qualified", "converted", "declined"],
+    },
+    { key: "source", label: "Source", type: "text", editable: true },
+    { key: "property_id", label: "Linked property", type: "uuid", editable: false },
+    { key: "area", label: "Area", type: "text", editable: true },
+    { key: "num_properties", label: "Number of properties", type: "text", editable: true },
+    { key: "bedrooms", label: "Bedrooms", type: "text", editable: true },
+    { key: "platforms", label: "Platforms", type: "text", editable: true },
+    { key: "occupancy", label: "Occupancy", type: "text", editable: true },
+    { key: "adr", label: "ADR", type: "text", editable: true },
+    {
+      key: "landlord_situation",
+      label: "Landlord situation",
+      type: "textarea",
+      editable: true,
+    },
+    {
+      key: "property_description",
+      label: "Property description",
+      type: "textarea",
+      editable: true,
+    },
+    { key: "hours_per_week", label: "Hours per week", type: "number", editable: true },
+    { key: "biggest_challenge", label: "Biggest challenge", type: "textarea", editable: true },
+    { key: "current_revenue", label: "Current revenue", type: "number", editable: true },
+    { key: "estimated_potential", label: "Estimated potential", type: "number", editable: true },
+    { key: "estimated_uplift", label: "Estimated uplift", type: "number", editable: true },
+    { key: "uplift_percent", label: "Uplift %", type: "number", editable: true },
+    {
+      key: "mailerlite_subscriber_id",
+      label: "MailerLite subscriber ID",
+      type: "text",
+      editable: false,
+    },
+    {
+      key: "mailerlite_synced_at",
+      label: "MailerLite synced at",
+      type: "datetime",
+      editable: false,
+    },
+    { key: "created_at", label: "Created at", type: "datetime", editable: false },
+    { key: "updated_at", label: "Updated at", type: "datetime", editable: false },
+  ],
+  relations: [{ field: "property_id", targetTable: "properties", labelFields: ["name"] }],
+  formGroups: [
+    { label: "Contact", fields: ["name", "email", "phone", "company"] },
+    { label: "Lead status", fields: ["status", "source", "property_id"] },
+    {
+      label: "Property details",
+      fields: [
+        "area",
+        "num_properties",
+        "bedrooms",
+        "platforms",
+        "occupancy",
+        "adr",
+        "landlord_situation",
+        "property_description",
+      ],
+    },
+    {
+      label: "Revenue estimate",
+      fields: [
+        "current_revenue",
+        "hours_per_week",
+        "biggest_challenge",
+        "estimated_potential",
+        "estimated_uplift",
+        "uplift_percent",
+      ],
+    },
+    {
+      label: "System",
+      fields: [
+        "id",
+        "mailerlite_subscriber_id",
+        "mailerlite_synced_at",
+        "created_at",
+        "updated_at",
+      ],
+    },
+  ],
+}
+
+const contactQueries: TableConfig = {
+  key: "contact_queries",
+  label: "Contact Query",
+  pluralLabel: "Contact Queries",
+  route: "/contact-queries",
+  primaryKey: "id",
+  listFields: ["name", "email", "topic", "status", "created_at"],
+  fields: [
+    { key: "id", label: "ID", type: "uuid", editable: false },
+    { key: "name", label: "Name", type: "text", editable: true },
+    { key: "email", label: "Email", type: "text", editable: true },
+    {
+      key: "topic",
+      label: "Topic",
+      type: "select",
+      editable: true,
+      options: ["Media query", "About a booking", "Hiring", "Partnership", "Other"],
+    },
+    { key: "property_name", label: "Property name", type: "text", editable: true },
+    { key: "message", label: "Message", type: "textarea", editable: true },
+    {
+      key: "status",
+      label: "Status",
+      type: "select",
+      editable: true,
+      options: ["new", "in_progress", "resolved"],
+    },
+    {
+      key: "mailerlite_subscriber_id",
+      label: "MailerLite subscriber ID",
+      type: "text",
+      editable: false,
+    },
+    {
+      key: "mailerlite_synced_at",
+      label: "MailerLite synced at",
+      type: "datetime",
+      editable: false,
+    },
+    { key: "created_at", label: "Created at", type: "datetime", editable: false },
+    { key: "updated_at", label: "Updated at", type: "datetime", editable: false },
+  ],
+  formGroups: [
+    { label: "Query", fields: ["name", "email", "topic", "property_name", "message"] },
+    { label: "Status", fields: ["status"] },
+    {
+      label: "System",
+      fields: [
+        "id",
+        "mailerlite_subscriber_id",
+        "mailerlite_synced_at",
+        "created_at",
+        "updated_at",
+      ],
+    },
+  ],
+}
+
 export const tableConfigs = {
   properties,
   guests,
   bookings,
+  landlord_leads: landlordLeads,
+  contact_queries: contactQueries,
 } satisfies Record<string, TableConfig>
 
 export type TableKey = keyof typeof tableConfigs

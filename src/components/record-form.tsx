@@ -94,6 +94,26 @@ export function RecordForm({
       )
     }
 
+    if (field.type === "select") {
+      return (
+        <div key={field.key} className="flex flex-col gap-1.5">
+          <Label htmlFor={field.key}>{field.label}</Label>
+          <select
+            id={field.key}
+            name={field.key}
+            defaultValue={(value as string) ?? ""}
+            className="h-9 rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus:border-[var(--sage)]"
+          >
+            {(field.options ?? []).map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
+      )
+    }
+
     const inputType =
       field.type === "date"
         ? "date"

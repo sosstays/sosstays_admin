@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Building2, Users, CalendarDays, ArrowRight } from "lucide-react"
+import { Building2, Users, CalendarDays, Handshake, MessageSquare, ArrowRight } from "lucide-react"
 import { countRows, listRows } from "@/lib/tables/queries"
 import { formatValue } from "@/lib/tables/format"
 import { StatusBadge } from "@/components/status-badge"
@@ -8,15 +8,20 @@ const STAT_ICONS = {
   properties: Building2,
   guests: Users,
   bookings: CalendarDays,
+  landlord_leads: Handshake,
+  contact_queries: MessageSquare,
 } as const
 
 export default async function DashboardHomePage() {
-  const [propertyCount, guestCount, bookingCount, recentBookings] = await Promise.all([
-    countRows("properties"),
-    countRows("guests"),
-    countRows("bookings"),
-    listRows("bookings"),
-  ])
+  const [propertyCount, guestCount, bookingCount, leadCount, queryCount, recentBookings] =
+    await Promise.all([
+      countRows("properties"),
+      countRows("guests"),
+      countRows("bookings"),
+      countRows("landlord_leads"),
+      countRows("contact_queries"),
+      listRows("bookings"),
+    ])
 
   const latestBookings = recentBookings.slice(0, 5)
 
@@ -26,6 +31,13 @@ export default async function DashboardHomePage() {
         <StatCard href="/properties" label="Properties" count={propertyCount} statKey="properties" />
         <StatCard href="/guests" label="Guests" count={guestCount} statKey="guests" />
         <StatCard href="/bookings" label="Bookings" count={bookingCount} statKey="bookings" />
+        <StatCard href="/leads" label="Landlord Leads" count={leadCount} statKey="landlord_leads" />
+        <StatCard
+          href="/contact-queries"
+          label="Contact Queries"
+          count={queryCount}
+          statKey="contact_queries"
+        />
       </div>
 
       <div>

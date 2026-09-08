@@ -7,6 +7,7 @@ export type FieldType =
   | "datetime"
   | "time"
   | "uuid"
+  | "select"
 
 export interface FieldConfig {
   /** Column name in the underlying table. */
@@ -15,6 +16,8 @@ export interface FieldConfig {
   type: FieldType
   /** Whether this field can be changed via the edit form. */
   editable: boolean
+  /** Allowed values for type "select" — matches a DB CHECK constraint's enum. */
+  options?: string[]
 }
 
 /** A forward foreign-key relation, e.g. bookings.property_id -> properties. */

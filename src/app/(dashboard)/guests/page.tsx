@@ -7,7 +7,7 @@ export default async function GuestsPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Guests</h1>
+      <h1 className="text-2xl font-bold text-[var(--ink)]">Guests</h1>
       <DataTable config={tableConfigs.guests} rows={rows} />
     </div>
   )

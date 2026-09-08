@@ -7,7 +7,7 @@ export default async function BookingsPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Bookings</h1>
+      <h1 className="text-2xl font-bold text-[var(--ink)]">Bookings</h1>
       <DataTable config={tableConfigs.bookings} rows={rows} />
     </div>
   )

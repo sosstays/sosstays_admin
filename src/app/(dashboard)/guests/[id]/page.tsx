@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { RecordForm } from "@/components/record-form"
 import { RelatedList } from "@/components/related-list"
+import { DetailHeader } from "@/components/detail-header"
 import { tableConfigs } from "@/lib/tables/config"
 import { getRow, listRelated } from "@/lib/tables/queries"
 import { updateRecord } from "@/lib/tables/actions"
@@ -20,8 +21,8 @@ export default async function GuestDetailPage({
   const name = [row.first_name, row.last_name].filter(Boolean).join(" ") || "Guest"
 
   return (
-    <div className="flex flex-col gap-8">
-      <h1 className="text-2xl font-semibold">{name}</h1>
+    <div className="flex flex-col gap-6">
+      <DetailHeader backHref="/guests" backLabel="guests" title={name} />
       <RecordForm config={config} row={row} action={action} />
       {config.relatedLists?.map((rl) => (
         <RelatedList

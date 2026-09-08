@@ -1,8 +1,14 @@
 import Link from "next/link"
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Building2, Users, CalendarDays, ArrowRight } from "lucide-react"
 import { countRows, listRows } from "@/lib/tables/queries"
-import { tableConfigs } from "@/lib/tables/config"
 import { formatValue } from "@/lib/tables/format"
+import { StatusBadge } from "@/components/status-badge"
+
+const STAT_ICONS = {
+  properties: Building2,
+  guests: Users,
+  bookings: CalendarDays,
+} as const
 
 export default async function DashboardHomePage() {
   const [propertyCount, guestCount, bookingCount, recentBookings] = await Promise.all([
@@ -15,18 +21,26 @@ export default async function DashboardHomePage() {
   const latestBookings = recentBookings.slice(0, 5)
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard href="/properties" label="Properties" count={propertyCount} />
-        <StatCard href="/guests" label="Guests" count={guestCount} />
-        <StatCard href="/bookings" label="Bookings" count={bookingCount} />
+    <div className="flex flex-col gap-10">
+      <div className="grid gap-5 sm:grid-cols-3">
+        <StatCard href="/properties" label="Properties" count={propertyCount} statKey="properties" />
+        <StatCard href="/guests" label="Guests" count={guestCount} statKey="guests" />
+        <StatCard href="/bookings" label="Bookings" count={bookingCount} statKey="bookings" />
       </div>
 
       <div>
-        <h2 className="mb-3 text-lg font-medium">Most recent bookings</h2>
-        <div className="flex flex-col divide-y rounded-md border">
+        <h2 className="section-title mb-3 text-lg font-semibold text-[var(--ink)]">
+          Most recent bookings
+        </h2>
+        <div className="overflow-hidden rounded-2xl border border-[var(--border-soft)] bg-white">
+          <div className="grid grid-cols-4 gap-4 bg-[var(--warm-cream)] px-5 py-3 text-xs font-medium uppercase tracking-wide text-[var(--ink-soft)]">
+            <span>Property</span>
+            <span>Guest</span>
+            <span>Dates</span>
+            <span>Status</span>
+          </div>
           {latestBookings.length === 0 ? (
-            <p className="p-4 text-sm text-muted-foreground">No bookings yet.</p>
+            <p className="p-5 text-sm text-muted-foreground">No bookings yet.</p>
           ) : (
             latestBookings.map((booking) => {
               const property = booking.properties as { name?: string } | null
@@ -41,15 +55,14 @@ export default async function DashboardHomePage() {
                 <Link
                   key={booking.id as string}
                   href={`/bookings/${booking.id}`}
-                  className="flex items-center justify-between gap-4 p-4 text-sm hover:bg-muted/50"
+                  className="grid grid-cols-4 items-center gap-4 border-t border-[var(--border-soft)] px-5 py-3.5 text-sm transition-colors hover:bg-[var(--sage-pale)]"
                 >
-                  <span className="font-medium">{property?.name ?? "—"}</span>
-                  <span className="text-muted-foreground">{guestName || "—"}</span>
-                  <span>
-                    {formatValue(booking.check_in, "date")} –{" "}
-                    {formatValue(booking.check_out, "date")}
+                  <span className="font-medium text-[var(--ink)]">{property?.name ?? "—"}</span>
+                  <span className="text-[var(--ink-soft)]">{guestName || "—"}</span>
+                  <span className="text-[var(--ink-soft)]">
+                    {formatValue(booking.check_in, "date")} – {formatValue(booking.check_out, "date")}
                   </span>
-                  <span className="capitalize">{String(booking.status ?? "—")}</span>
+                  <StatusBadge status={booking.status as string | null} />
                 </Link>
               )
             })
@@ -60,16 +73,38 @@ export default async function DashboardHomePage() {
   )
 }
 
-function StatCard({ href, label, count }: { href: string; label: string; count: number }) {
-  const config = tableConfigs[label.toLowerCase() as keyof typeof tableConfigs]
+function StatCard({
+  href,
+  label,
+  count,
+  statKey,
+}: {
+  href: string
+  label: string
+  count: number
+  statKey: keyof typeof STAT_ICONS
+}) {
+  const Icon = STAT_ICONS[statKey]
+
   return (
-    <Link href={href}>
-      <Card className="transition-colors hover:bg-muted/50">
-        <CardHeader>
-          <CardDescription>{config?.pluralLabel ?? label}</CardDescription>
-          <CardTitle className="text-3xl">{count}</CardTitle>
-        </CardHeader>
-      </Card>
+    <Link
+      href={href}
+      className="group flex flex-col gap-4 rounded-2xl border border-[var(--border-soft)] bg-white p-5 transition-colors hover:border-[var(--sage)]"
+    >
+      <div className="flex items-start justify-between">
+        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--sage-pale)] text-[var(--forest-deep)]">
+          <Icon className="h-5 w-5" strokeWidth={1.9} />
+        </span>
+        <span className="flex items-center gap-1 text-xs font-medium text-[var(--forest-deep)] opacity-0 transition-opacity group-hover:opacity-100">
+          View all <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} />
+        </span>
+      </div>
+      <div>
+        <p className="text-sm text-[var(--ink-soft)]">{label}</p>
+        <p className="font-heading text-[38px] font-bold leading-tight text-[var(--ink)]">
+          {count}
+        </p>
+      </div>
     </Link>
   )
 }

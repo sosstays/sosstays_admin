@@ -6,9 +6,11 @@ export const dynamic = "force-dynamic"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex h-screen overflow-hidden">
       <Nav />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
+      <main className="flex-1 overflow-y-auto bg-[var(--background)] px-13 py-11">
+        {children}
+      </main>
     </div>
   )
 }

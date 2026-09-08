@@ -57,9 +57,11 @@ export async function listRelated(
   id: string
 ): Promise<Row[]> {
   const config = tableConfigs[sourceTable]
+  const embeds = buildEmbeds(config)
+  const select = embeds ? `*,${embeds}` : "*"
   const { data, error } = await supabaseAdmin
     .from(sourceTable)
-    .select("*")
+    .select(select)
     .eq(foreignKey, id)
     .order(defaultOrderColumn(config), { ascending: false, nullsFirst: false })
 
@@ -68,7 +70,7 @@ export async function listRelated(
       `Failed to list related ${config.key} where ${foreignKey}=${id}: ${error.message}`
     )
   }
-  return (data ?? []) as Row[]
+  return (data ?? []) as unknown as Row[]
 }
 
 /** Updates the editable fields of a row and returns the updated record. */

@@ -38,6 +38,12 @@ export interface RelatedListConfig {
   columns: string[]
 }
 
+/** A group of fields shown together as one card on a detail/edit page. Presentation only. */
+export interface FormGroupConfig {
+  label: string
+  fields: string[]
+}
+
 export interface TableConfig {
   key: string
   label: string
@@ -49,6 +55,10 @@ export interface TableConfig {
   listFields: string[]
   relations?: RelationConfig[]
   relatedLists?: RelatedListConfig[]
+  /** Field keys combined into initials for a small avatar in the list view (e.g. guest name). */
+  avatarFields?: string[]
+  /** Groups the edit form's fields into stacked cards, in order. Fields left out fall into a trailing "Details" group. */
+  formGroups?: FormGroupConfig[]
 }
 
 export function getField(config: TableConfig, key: string): FieldConfig {

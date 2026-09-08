@@ -55,6 +55,7 @@ const guests: TableConfig = {
   route: "/guests",
   primaryKey: "id",
   listFields: ["first_name", "last_name", "email", "phone", "email_verified", "created_at"],
+  avatarFields: ["first_name", "last_name"],
   fields: [
     { key: "id", label: "ID", type: "uuid", editable: false },
     { key: "first_name", label: "First name", type: "text", editable: true },
@@ -166,6 +167,27 @@ const bookings: TableConfig = {
   relations: [
     { field: "property_id", targetTable: "properties", labelFields: ["name"] },
     { field: "guest_id", targetTable: "guests", labelFields: ["first_name", "last_name"] },
+  ],
+  formGroups: [
+    {
+      label: "Stay details",
+      fields: [
+        "uplisting_reservation_id",
+        "channel",
+        "status",
+        "check_in",
+        "check_out",
+        "arrival_time",
+        "room_number",
+        "revenue",
+      ],
+    },
+    {
+      label: "Guest & contact",
+      fields: ["guest_name_raw", "ota_email", "ota_phone", "ota_phone_reliable"],
+    },
+    { label: "Access", fields: ["lock_code", "checkin_token"] },
+    { label: "System", fields: ["id", "confirmation_sent_at", "reminder_sent_at", "created_at"] },
   ],
 }
 

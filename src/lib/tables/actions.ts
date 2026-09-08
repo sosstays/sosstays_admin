@@ -1,12 +1,39 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
+import { redirect } from "next/navigation"
 import { tableConfigs, type TableKey } from "./config"
-import { updateRow } from "./queries"
+import { updateRow, insertRow } from "./queries"
+import type { FieldConfig } from "./types"
 
 export interface UpdateState {
   error?: string
   success?: boolean
+}
+
+function parseFormData(fields: FieldConfig[], formData: FormData): Record<string, unknown> {
+  const values: Record<string, unknown> = {}
+
+  for (const field of fields) {
+    if (!field.editable) continue
+
+    if (field.type === "boolean") {
+      values[field.key] = formData.get(field.key) === "on"
+      continue
+    }
+
+    const raw = formData.get(field.key)
+    if (raw === null) continue
+    const value = String(raw).trim()
+
+    if (field.type === "number") {
+      values[field.key] = value === "" ? null : Number(value)
+    } else {
+      values[field.key] = value === "" ? null : value
+    }
+  }
+
+  return values
 }
 
 /**
@@ -21,26 +48,7 @@ export async function updateRecord(
   formData: FormData
 ): Promise<UpdateState> {
   const config = tableConfigs[tableKey]
-  const patch: Record<string, unknown> = {}
-
-  for (const field of config.fields) {
-    if (!field.editable) continue
-
-    if (field.type === "boolean") {
-      patch[field.key] = formData.get(field.key) === "on"
-      continue
-    }
-
-    const raw = formData.get(field.key)
-    if (raw === null) continue
-    const value = String(raw).trim()
-
-    if (field.type === "number") {
-      patch[field.key] = value === "" ? null : Number(value)
-    } else {
-      patch[field.key] = value === "" ? null : value
-    }
-  }
+  const patch = parseFormData(config.fields, formData)
 
   try {
     await updateRow(tableKey, id, patch)
@@ -51,4 +59,28 @@ export async function updateRecord(
   revalidatePath(`${config.route}/${id}`)
   revalidatePath(config.route)
   return { success: true }
+}
+
+/**
+ * Generic create action for any configured table. Bind `tableKey` with
+ * `.bind(null, tableKey)` before handing this to useActionState. On success
+ * it redirects to the new record's detail page.
+ */
+export async function createRecord(
+  tableKey: TableKey,
+  _prevState: UpdateState,
+  formData: FormData
+): Promise<UpdateState> {
+  const config = tableConfigs[tableKey]
+  const data = parseFormData(config.fields, formData)
+
+  let created
+  try {
+    created = await insertRow(tableKey, data)
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to create record." }
+  }
+
+  revalidatePath(config.route)
+  redirect(`${config.route}/${created[config.primaryKey]}`)
 }

@@ -101,6 +101,27 @@ export async function updateRow(
   return data as Row
 }
 
+/** Inserts a new row from the table's editable fields and returns the created record. */
+export async function insertRow(tableKey: TableKey, data: Record<string, unknown>): Promise<Row> {
+  const config = tableConfigs[tableKey]
+  const editableKeys = new Set(config.fields.filter((f) => f.editable).map((f) => f.key))
+  const safeData: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(data)) {
+    if (editableKeys.has(key)) safeData[key] = value
+  }
+
+  const { data: row, error } = await supabaseAdmin
+    .from(tableKey)
+    // Data is built dynamically from per-table field config, so it can't be
+    // statically typed as one of the generated per-table Insert shapes.
+    .insert(safeData as never)
+    .select("*")
+    .single()
+
+  if (error) throw new Error(`Failed to create ${config.key}: ${error.message}`)
+  return row as Row
+}
+
 export async function countRows(tableKey: TableKey): Promise<number> {
   const config = tableConfigs[tableKey]
   const { count, error } = await supabaseAdmin

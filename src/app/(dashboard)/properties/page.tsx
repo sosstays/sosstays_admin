@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Building2 } from "lucide-react"
+import { Building2, Plus } from "lucide-react"
 import { listRows } from "@/lib/tables/queries"
 import type { Row } from "@/lib/tables/queries"
 
@@ -53,7 +53,16 @@ export default async function PropertiesPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold text-[var(--ink)]">Properties</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold text-[var(--ink)]">Properties</h1>
+        <Link
+          href="/properties/new"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-[var(--forest)] px-3.5 py-2 text-sm font-medium text-[var(--cream)] transition-colors hover:bg-[var(--forest-deep)]"
+        >
+          <Plus className="h-4 w-4" strokeWidth={2} />
+          New property
+        </Link>
+      </div>
 
       {properties.length === 0 ? (
         <p className="text-sm text-muted-foreground">No properties found.</p>

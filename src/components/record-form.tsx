@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useState, useTransition } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,8 +9,8 @@ import { Textarea } from "@/components/ui/textarea"
 import type { FieldConfig, TableConfig } from "@/lib/tables/types"
 import type { Row } from "@/lib/tables/queries"
 import { formatValue } from "@/lib/tables/format"
-import type { UpdateState } from "@/lib/tables/actions"
-import { tableConfigs } from "@/lib/tables/config"
+import { deleteRecord, type UpdateState } from "@/lib/tables/actions"
+import { tableConfigs, type TableKey } from "@/lib/tables/config"
 
 export function RecordForm({
   config,
@@ -22,7 +22,19 @@ export function RecordForm({
   action: (state: UpdateState, formData: FormData) => Promise<UpdateState>
 }) {
   const [state, formAction, pending] = useActionState(action, {})
+  const [deleting, startDelete] = useTransition()
+  const [deleteError, setDeleteError] = useState<string | null>(null)
   const relationByField = new Map((config.relations ?? []).map((r) => [r.field, r]))
+
+  function handleDelete() {
+    if (!window.confirm(`Delete this ${config.label.toLowerCase()}? This cannot be undone.`)) return
+    setDeleteError(null)
+    startDelete(async () => {
+      const result = await deleteRecord(config.key as TableKey, String(row[config.primaryKey]))
+      // On success the action redirects, so only a failure returns here.
+      if (result?.error) setDeleteError(result.error)
+    })
+  }
 
   function renderField(field: FieldConfig) {
     const value = row[field.key]
@@ -163,14 +175,28 @@ export function RecordForm({
         </p>
       ) : null}
       {state.success ? <p className="text-sm text-[var(--forest-deep)]">Saved.</p> : null}
+      {deleteError ? (
+        <p className="rounded-md bg-[var(--error-bg)] px-3 py-2 text-sm text-[var(--error)]">
+          {deleteError}
+        </p>
+      ) : null}
 
-      <div>
+      <div className="flex items-center justify-between gap-3">
         <Button
           type="submit"
           disabled={pending}
           className="bg-[var(--forest)] text-[var(--cream)] hover:bg-[var(--forest-deep)]"
         >
           {pending ? "Saving..." : "Save changes"}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={deleting}
+          onClick={handleDelete}
+          className="border-[var(--error)] text-[var(--error)] hover:bg-[var(--error-bg)]"
+        >
+          {deleting ? "Deleting..." : `Delete ${config.label.toLowerCase()}`}
         </Button>
       </div>
     </form>

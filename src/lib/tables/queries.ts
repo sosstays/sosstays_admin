@@ -131,3 +131,11 @@ export async function countRows(tableKey: TableKey): Promise<number> {
   if (error) throw new Error(`Failed to count ${config.key}: ${error.message}`)
   return count ?? 0
 }
+
+/** Deletes a single row by primary key. */
+export async function deleteRow(tableKey: TableKey, id: string): Promise<void> {
+  const config = tableConfigs[tableKey]
+  const { error } = await supabaseAdmin.from(tableKey).delete().eq(config.primaryKey, id)
+
+  if (error) throw new Error(`Failed to delete ${config.key} ${id}: ${error.message}`)
+}

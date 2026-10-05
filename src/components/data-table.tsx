@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
-import { Search, Columns3 } from "lucide-react"
+import { Search, Columns3, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import {
   Table,
   TableBody,
@@ -18,6 +18,8 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -38,6 +40,8 @@ export function DataTable({ config, rows }: { config: TableConfig; rows: Row[] }
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<string | null>(null)
   const [visibleKeys, setVisibleKeys] = useState<string[]>(config.listFields)
+  const [sortKey, setSortKey] = useState<string | null>(null)
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc")
 
   const storageKey = `sos-admin:columns:${config.key}`
 
@@ -90,12 +94,44 @@ export function DataTable({ config, rows }: { config: TableConfig; rows: Row[] }
     return formatValue(row[key], getField(config, key).type)
   }
 
-  const filteredRows = rows.filter((row) => {
-    if (statusFilter && String(row.status ?? "") !== statusFilter) return false
-    if (!search.trim()) return true
-    const haystack = visibleKeys.map((key) => cellText(row, key)).join(" ").toLowerCase()
-    return haystack.includes(search.trim().toLowerCase())
-  })
+  function compareRows(a: Row, b: Row, key: string): number {
+    const relation = relationByField.get(key)
+    const av = relation ? cellText(a, key) : a[key]
+    const bv = relation ? cellText(b, key) : b[key]
+    const aEmpty = av === null || av === undefined || av === ""
+    const bEmpty = bv === null || bv === undefined || bv === ""
+    // Empty values always sort last, regardless of direction.
+    if (aEmpty || bEmpty) return aEmpty === bEmpty ? 0 : aEmpty ? 1 : -1
+    const type = getField(config, key).type
+    const result =
+      type === "number"
+        ? Number(av) - Number(bv)
+        : type === "boolean"
+          ? Number(av) - Number(bv)
+          : String(av).localeCompare(String(bv), undefined, { numeric: true, sensitivity: "base" })
+    return sortDir === "asc" ? result : -result
+  }
+
+  const filteredRows = rows
+    .filter((row) => {
+      if (statusFilter && String(row.status ?? "") !== statusFilter) return false
+      if (!search.trim()) return true
+      const haystack = visibleKeys.map((key) => cellText(row, key)).join(" ").toLowerCase()
+      return haystack.includes(search.trim().toLowerCase())
+    })
+    .sort((a, b) => (sortKey ? compareRows(a, b, sortKey) : 0))
+
+  function toggleHeaderSort(key: string) {
+    if (sortKey !== key) {
+      setSortKey(key)
+      setSortDir("asc")
+    } else if (sortDir === "asc") {
+      setSortDir("desc")
+    } else {
+      setSortKey(null)
+      setSortDir("asc")
+    }
+  }
 
   return (
     <div className="flex flex-col gap-3">
@@ -132,6 +168,42 @@ export function DataTable({ config, rows }: { config: TableConfig; rows: Row[] }
           <DropdownMenuTrigger
             render={
               <Button variant="outline" size="sm" className="ml-auto gap-1.5">
+                <ArrowUpDown className="h-4 w-4" strokeWidth={1.9} />
+                {sortKey ? `Sort: ${getField(config, sortKey).label}` : "Sort by"}
+              </Button>
+            }
+          />
+          <DropdownMenuContent align="end" className="max-h-80 overflow-y-auto">
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuRadioGroup
+                value={sortKey ?? ""}
+                onValueChange={(value) => setSortKey(value || null)}
+              >
+                <DropdownMenuRadioItem value="">Default order</DropdownMenuRadioItem>
+                {config.fields.map((field) => (
+                  <DropdownMenuRadioItem key={field.key} value={field.key}>
+                    {field.label}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuRadioGroup
+                value={sortDir}
+                onValueChange={(value) => setSortDir(value as "asc" | "desc")}
+              >
+                <DropdownMenuRadioItem value="asc">Ascending</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="desc">Descending</DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button variant="outline" size="sm" className="gap-1.5">
                 <Columns3 className="h-4 w-4" strokeWidth={1.9} />
                 Columns
               </Button>
@@ -165,7 +237,20 @@ export function DataTable({ config, rows }: { config: TableConfig; rows: Row[] }
                   key={key}
                   className="whitespace-nowrap text-xs font-medium uppercase tracking-wide text-[var(--ink-soft)]"
                 >
-                  {getField(config, key).label}
+                  <button
+                    type="button"
+                    onClick={() => toggleHeaderSort(key)}
+                    className="inline-flex items-center gap-1 uppercase hover:text-[var(--ink)]"
+                  >
+                    {getField(config, key).label}
+                    {sortKey === key ? (
+                      sortDir === "asc" ? (
+                        <ArrowUp className="h-3 w-3" strokeWidth={2.2} />
+                      ) : (
+                        <ArrowDown className="h-3 w-3" strokeWidth={2.2} />
+                      )
+                    ) : null}
+                  </button>
                 </TableHead>
               ))}
             </TableRow>

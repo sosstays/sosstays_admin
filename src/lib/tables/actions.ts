@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { tableConfigs, type TableKey } from "./config"
-import { updateRow, insertRow } from "./queries"
+import { updateRow, insertRow, deleteRow } from "./queries"
 import type { FieldConfig } from "./types"
 
 export interface UpdateState {
@@ -83,4 +83,22 @@ export async function createRecord(
 
   revalidatePath(config.route)
   redirect(`${config.route}/${created[config.primaryKey]}`)
+}
+
+/**
+ * Generic delete action for any configured table. On success it redirects to
+ * the table's list page; on failure (e.g. a foreign key still references the
+ * row) it returns the error so the caller can show it.
+ */
+export async function deleteRecord(tableKey: TableKey, id: string): Promise<UpdateState> {
+  const config = tableConfigs[tableKey]
+
+  try {
+    await deleteRow(tableKey, id)
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to delete record." }
+  }
+
+  revalidatePath(config.route)
+  redirect(config.route)
 }

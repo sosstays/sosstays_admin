@@ -2,7 +2,19 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Building2, Users, CalendarDays, Handshake, MessageSquare, LogOut } from "lucide-react"
+import {
+  Home,
+  Building2,
+  Users,
+  CalendarDays,
+  Handshake,
+  MessageSquare,
+  Contact,
+  Store,
+  Briefcase,
+  Mail,
+  LogOut,
+} from "lucide-react"
 import { logout } from "@/lib/auth/actions"
 import { Logo } from "@/components/logo"
 import {
@@ -17,11 +29,15 @@ import {
 
 const links = [
   { href: "/", label: "Dashboard", icon: Home },
+  { href: "/contacts", label: "Contacts", icon: Contact },
   { href: "/properties", label: "Properties", icon: Building2 },
   { href: "/guests", label: "Guests", icon: Users },
   { href: "/bookings", label: "Bookings", icon: CalendarDays },
   { href: "/leads", label: "Landlord Leads", icon: Handshake },
+  { href: "/partner-leads", label: "Partner Leads", icon: Store },
+  { href: "/corporate-leads", label: "Corporate Leads", icon: Briefcase },
   { href: "/contact-queries", label: "Contact Queries", icon: MessageSquare },
+  { href: "/newsletter", label: "Newsletter", icon: Mail },
 ]
 
 export function Nav() {

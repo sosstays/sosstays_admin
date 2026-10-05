@@ -1,5 +1,15 @@
 import Link from "next/link"
-import { Building2, Users, CalendarDays, Handshake, MessageSquare, ArrowRight } from "lucide-react"
+import {
+  Building2,
+  Users,
+  CalendarDays,
+  Handshake,
+  MessageSquare,
+  Store,
+  Briefcase,
+  Mail,
+  ArrowRight,
+} from "lucide-react"
 import { countRows, listRows } from "@/lib/tables/queries"
 import { formatValue } from "@/lib/tables/format"
 import { StatusBadge } from "@/components/status-badge"
@@ -10,18 +20,33 @@ const STAT_ICONS = {
   bookings: CalendarDays,
   landlord_leads: Handshake,
   contact_queries: MessageSquare,
+  partner_leads: Store,
+  corporate_leads: Briefcase,
+  newsletter_subscribers: Mail,
 } as const
 
 export default async function DashboardHomePage() {
-  const [propertyCount, guestCount, bookingCount, leadCount, queryCount, recentBookings] =
-    await Promise.all([
-      countRows("properties"),
-      countRows("guests"),
-      countRows("bookings"),
-      countRows("landlord_leads"),
-      countRows("contact_queries"),
-      listRows("bookings"),
-    ])
+  const [
+    propertyCount,
+    guestCount,
+    bookingCount,
+    leadCount,
+    queryCount,
+    partnerCount,
+    corporateCount,
+    subscriberCount,
+    recentBookings,
+  ] = await Promise.all([
+    countRows("properties"),
+    countRows("guests"),
+    countRows("bookings"),
+    countRows("landlord_leads"),
+    countRows("contact_queries"),
+    countRows("partner_leads"),
+    countRows("corporate_leads"),
+    countRows("newsletter_subscribers"),
+    listRows("bookings"),
+  ])
 
   const latestBookings = recentBookings.slice(0, 5)
 
@@ -37,6 +62,24 @@ export default async function DashboardHomePage() {
           label="Contact Queries"
           count={queryCount}
           statKey="contact_queries"
+        />
+        <StatCard
+          href="/partner-leads"
+          label="Partner Leads"
+          count={partnerCount}
+          statKey="partner_leads"
+        />
+        <StatCard
+          href="/corporate-leads"
+          label="Corporate Leads"
+          count={corporateCount}
+          statKey="corporate_leads"
+        />
+        <StatCard
+          href="/newsletter"
+          label="Newsletter Subscribers"
+          count={subscriberCount}
+          statKey="newsletter_subscribers"
         />
       </div>
 

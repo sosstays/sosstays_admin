@@ -1,4 +1,4 @@
-import type { TableConfig } from "./types"
+import type { FieldConfig, TableConfig } from "./types"
 
 const properties: TableConfig = {
   key: "properties",
@@ -243,6 +243,13 @@ const landlordLeads: TableConfig = {
     { key: "estimated_potential", label: "Estimated potential", type: "number", editable: true },
     { key: "estimated_uplift", label: "Estimated uplift", type: "number", editable: true },
     { key: "uplift_percent", label: "Uplift %", type: "number", editable: true },
+    { key: "marketing_consent", label: "Marketing consent", type: "boolean", editable: false },
+    {
+      key: "marketing_consent_at",
+      label: "Consent given at",
+      type: "datetime",
+      editable: false,
+    },
     {
       key: "mailerlite_subscriber_id",
       label: "MailerLite subscriber ID",
@@ -262,6 +269,7 @@ const landlordLeads: TableConfig = {
   formGroups: [
     { label: "Contact", fields: ["name", "email", "phone", "company"] },
     { label: "Lead status", fields: ["status", "source", "property_id"] },
+    { label: "Marketing consent", fields: ["marketing_consent", "marketing_consent_at"] },
     {
       label: "Property details",
       fields: [
@@ -357,12 +365,132 @@ const contactQueries: TableConfig = {
   ],
 }
 
+const LEAD_STATUSES = ["new", "contacted", "qualified", "converted", "declined"]
+
+const mailerliteFields = [
+  {
+    key: "mailerlite_subscriber_id",
+    label: "MailerLite subscriber ID",
+    type: "text",
+    editable: false,
+  },
+  {
+    key: "mailerlite_synced_at",
+    label: "MailerLite synced at",
+    type: "datetime",
+    editable: false,
+  },
+] as const satisfies FieldConfig[]
+
+const systemFields = [
+  { key: "created_at", label: "Created at", type: "datetime", editable: false },
+  { key: "updated_at", label: "Updated at", type: "datetime", editable: false },
+] as const satisfies FieldConfig[]
+
+const partnerLeads: TableConfig = {
+  key: "partner_leads",
+  label: "Partner Lead",
+  pluralLabel: "Partner Leads",
+  route: "/partner-leads",
+  primaryKey: "id",
+  listFields: ["business_name", "contact_name", "email", "phone", "category", "status", "created_at"],
+  fields: [
+    { key: "id", label: "ID", type: "uuid", editable: false },
+    { key: "business_name", label: "Business name", type: "text", editable: true },
+    { key: "contact_name", label: "Contact name", type: "text", editable: true },
+    { key: "email", label: "Email", type: "text", editable: true },
+    { key: "phone", label: "Phone", type: "text", editable: true },
+    { key: "website", label: "Website", type: "text", editable: true },
+    { key: "category", label: "Category", type: "text", editable: true },
+    { key: "location", label: "Location", type: "text", editable: true },
+    { key: "about_business", label: "About the business", type: "textarea", editable: true },
+    { key: "referral", label: "How they heard about us", type: "text", editable: true },
+    { key: "status", label: "Status", type: "select", editable: true, options: LEAD_STATUSES },
+    ...mailerliteFields,
+    ...systemFields,
+  ],
+  formGroups: [
+    { label: "Contact", fields: ["business_name", "contact_name", "email", "phone", "website"] },
+    { label: "Business", fields: ["category", "location", "about_business", "referral"] },
+    { label: "Lead status", fields: ["status"] },
+    {
+      label: "System",
+      fields: ["id", "mailerlite_subscriber_id", "mailerlite_synced_at", "created_at", "updated_at"],
+    },
+  ],
+}
+
+const corporateLeads: TableConfig = {
+  key: "corporate_leads",
+  label: "Corporate Lead",
+  pluralLabel: "Corporate Leads",
+  route: "/corporate-leads",
+  primaryKey: "id",
+  listFields: ["name", "company", "email", "phone", "number_of_workers", "status", "created_at"],
+  fields: [
+    { key: "id", label: "ID", type: "uuid", editable: false },
+    { key: "name", label: "Name", type: "text", editable: true },
+    { key: "company", label: "Company", type: "text", editable: true },
+    { key: "email", label: "Email", type: "text", editable: true },
+    { key: "phone", label: "Phone", type: "text", editable: true },
+    { key: "location_needed", label: "Location needed", type: "text", editable: true },
+    { key: "number_of_workers", label: "Number of workers", type: "text", editable: true },
+    { key: "duration", label: "Duration", type: "text", editable: true },
+    { key: "message", label: "Message", type: "textarea", editable: true },
+    { key: "status", label: "Status", type: "select", editable: true, options: LEAD_STATUSES },
+    ...mailerliteFields,
+    ...systemFields,
+  ],
+  formGroups: [
+    { label: "Contact", fields: ["name", "company", "email", "phone"] },
+    { label: "Requirement", fields: ["location_needed", "number_of_workers", "duration", "message"] },
+    { label: "Lead status", fields: ["status"] },
+    {
+      label: "System",
+      fields: ["id", "mailerlite_subscriber_id", "mailerlite_synced_at", "created_at", "updated_at"],
+    },
+  ],
+}
+
+const newsletterSubscribers: TableConfig = {
+  key: "newsletter_subscribers",
+  label: "Subscriber",
+  pluralLabel: "Newsletter Subscribers",
+  route: "/newsletter",
+  primaryKey: "id",
+  listFields: ["email", "status", "source", "created_at"],
+  fields: [
+    { key: "id", label: "ID", type: "uuid", editable: false },
+    { key: "email", label: "Email", type: "text", editable: true },
+    {
+      key: "status",
+      label: "Status",
+      type: "select",
+      editable: true,
+      options: ["subscribed", "unsubscribed"],
+    },
+    { key: "source", label: "Source", type: "text", editable: true },
+    ...mailerliteFields,
+    ...systemFields,
+  ],
+  formGroups: [
+    { label: "Subscriber", fields: ["email", "status", "source"] },
+    {
+      label: "System",
+      fields: ["id", "mailerlite_subscriber_id", "mailerlite_synced_at", "created_at", "updated_at"],
+    },
+  ],
+}
+
 export const tableConfigs = {
   properties,
   guests,
   bookings,
   landlord_leads: landlordLeads,
   contact_queries: contactQueries,
+  partner_leads: partnerLeads,
+  corporate_leads: corporateLeads,
+  newsletter_subscribers: newsletterSubscribers,
 } satisfies Record<string, TableConfig>
 
 export type TableKey = keyof typeof tableConfigs

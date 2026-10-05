@@ -145,6 +145,57 @@ export type Database = {
         }
         Relationships: []
       }
+      corporate_leads: {
+        Row: {
+          company: string | null
+          created_at: string
+          duration: string | null
+          email: string
+          id: string
+          location_needed: string | null
+          mailerlite_subscriber_id: string | null
+          mailerlite_synced_at: string | null
+          message: string | null
+          name: string | null
+          number_of_workers: string | null
+          phone: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          duration?: string | null
+          email: string
+          id?: string
+          location_needed?: string | null
+          mailerlite_subscriber_id?: string | null
+          mailerlite_synced_at?: string | null
+          message?: string | null
+          name?: string | null
+          number_of_workers?: string | null
+          phone?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          duration?: string | null
+          email?: string
+          id?: string
+          location_needed?: string | null
+          mailerlite_subscriber_id?: string | null
+          mailerlite_synced_at?: string | null
+          message?: string | null
+          name?: string | null
+          number_of_workers?: string | null
+          phone?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       guests: {
         Row: {
           auth_user_id: string | null
@@ -198,6 +249,8 @@ export type Database = {
           landlord_situation: string | null
           mailerlite_subscriber_id: string | null
           mailerlite_synced_at: string | null
+          marketing_consent: boolean | null
+          marketing_consent_at: string | null
           name: string | null
           num_properties: string | null
           occupancy: string | null
@@ -226,6 +279,8 @@ export type Database = {
           landlord_situation?: string | null
           mailerlite_subscriber_id?: string | null
           mailerlite_synced_at?: string | null
+          marketing_consent?: boolean | null
+          marketing_consent_at?: string | null
           name?: string | null
           num_properties?: string | null
           occupancy?: string | null
@@ -254,6 +309,8 @@ export type Database = {
           landlord_situation?: string | null
           mailerlite_subscriber_id?: string | null
           mailerlite_synced_at?: string | null
+          marketing_consent?: boolean | null
+          marketing_consent_at?: string | null
           name?: string | null
           num_properties?: string | null
           occupancy?: string | null
@@ -275,6 +332,93 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      newsletter_subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          mailerlite_subscriber_id: string | null
+          mailerlite_synced_at: string | null
+          source: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          mailerlite_subscriber_id?: string | null
+          mailerlite_synced_at?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          mailerlite_subscriber_id?: string | null
+          mailerlite_synced_at?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      partner_leads: {
+        Row: {
+          about_business: string | null
+          business_name: string | null
+          category: string | null
+          contact_name: string | null
+          created_at: string
+          email: string
+          id: string
+          location: string | null
+          mailerlite_subscriber_id: string | null
+          mailerlite_synced_at: string | null
+          phone: string | null
+          referral: string | null
+          status: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          about_business?: string | null
+          business_name?: string | null
+          category?: string | null
+          contact_name?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          location?: string | null
+          mailerlite_subscriber_id?: string | null
+          mailerlite_synced_at?: string | null
+          phone?: string | null
+          referral?: string | null
+          status?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          about_business?: string | null
+          business_name?: string | null
+          category?: string | null
+          contact_name?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          location?: string | null
+          mailerlite_subscriber_id?: string | null
+          mailerlite_synced_at?: string | null
+          phone?: string | null
+          referral?: string | null
+          status?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
       }
       properties: {
         Row: {
@@ -305,6 +449,18 @@ export type Database = {
       }
     }
     Views: {
+      contacts: {
+        Row: {
+          email: string | null
+          first_seen: string | null
+          last_seen: string | null
+          name: string | null
+          phone: string | null
+          roles: string[] | null
+          touchpoints: number | null
+        }
+        Relationships: []
+      }
       guest_profiles: {
         Row: {
           channels_used: string[] | null

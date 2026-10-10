@@ -482,6 +482,42 @@ const newsletterSubscribers: TableConfig = {
   ],
 }
 
+const conciergeSignups: TableConfig = {
+  key: "concierge_signups",
+  label: "Concierge Guest",
+  pluralLabel: "Concierge Guests",
+  route: "/concierge",
+  primaryKey: "id",
+  listFields: ["name", "email", "property_id", "property_name", "booking_id", "marketing_consent", "last_seen_at"],
+  avatarFields: ["name"],
+  fields: [
+    { key: "id", label: "ID", type: "uuid", editable: false },
+    { key: "name", label: "Name", type: "text", editable: true },
+    { key: "email", label: "Email", type: "text", editable: true },
+    { key: "property_id", label: "Property", type: "uuid", editable: false },
+    { key: "property_name", label: "Concierge property", type: "text", editable: false },
+    { key: "site_host", label: "Concierge site", type: "text", editable: false },
+    { key: "booking_id", label: "Booking", type: "uuid", editable: false },
+    { key: "marketing_consent", label: "Marketing consent", type: "boolean", editable: false },
+    { key: "visit_count", label: "Visits", type: "number", editable: false },
+    { key: "created_at", label: "First seen", type: "datetime", editable: false },
+    { key: "last_seen_at", label: "Last seen", type: "datetime", editable: false },
+  ],
+  relations: [
+    { field: "property_id", targetTable: "properties", labelFields: ["name"] },
+    { field: "booking_id", targetTable: "bookings", labelFields: ["check_in", "check_out"] },
+  ],
+  quickFilters: [
+    { label: "No booking", field: "booking_id", empty: true },
+    { label: "Has booking", field: "booking_id", empty: false },
+  ],
+  formGroups: [
+    { label: "Guest", fields: ["name", "email", "marketing_consent"] },
+    { label: "Stay", fields: ["property_id", "property_name", "site_host", "booking_id"] },
+    { label: "Activity", fields: ["visit_count", "created_at", "last_seen_at", "id"] },
+  ],
+}
+
 export const tableConfigs = {
   properties,
   guests,
@@ -491,6 +527,7 @@ export const tableConfigs = {
   partner_leads: partnerLeads,
   corporate_leads: corporateLeads,
   newsletter_subscribers: newsletterSubscribers,
+  concierge_signups: conciergeSignups,
 } satisfies Record<string, TableConfig>
 
 export type TableKey = keyof typeof tableConfigs

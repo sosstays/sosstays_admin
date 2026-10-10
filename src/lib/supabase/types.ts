@@ -103,6 +103,63 @@ export type Database = {
           },
         ]
       }
+      concierge_signups: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          email: string
+          id: string
+          last_seen_at: string
+          marketing_consent: boolean
+          name: string | null
+          property_id: string | null
+          property_name: string | null
+          site_host: string
+          visit_count: number
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          last_seen_at?: string
+          marketing_consent?: boolean
+          name?: string | null
+          property_id?: string | null
+          property_name?: string | null
+          site_host: string
+          visit_count?: number
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          last_seen_at?: string
+          marketing_consent?: boolean
+          name?: string | null
+          property_id?: string | null
+          property_name?: string | null
+          site_host?: string
+          visit_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concierge_signups_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concierge_signups_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_queries: {
         Row: {
           created_at: string

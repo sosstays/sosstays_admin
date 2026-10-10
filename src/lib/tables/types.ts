@@ -47,6 +47,14 @@ export interface FormGroupConfig {
   fields: string[]
 }
 
+/** A one-click list filter on whether a field is empty, e.g. "No booking" for a null booking_id. */
+export interface QuickFilterConfig {
+  label: string
+  field: string
+  /** true keeps rows where the field is empty; false keeps rows where it is set. */
+  empty: boolean
+}
+
 export interface TableConfig {
   key: string
   label: string
@@ -62,6 +70,8 @@ export interface TableConfig {
   avatarFields?: string[]
   /** Groups the edit form's fields into stacked cards, in order. Fields left out fall into a trailing "Details" group. */
   formGroups?: FormGroupConfig[]
+  /** Extra filter pills shown above the list, next to the status pills. */
+  quickFilters?: QuickFilterConfig[]
 }
 
 export function getField(config: TableConfig, key: string): FieldConfig {

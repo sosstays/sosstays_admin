@@ -39,6 +39,7 @@ function initials(row: Row, fields: string[]): string {
 export function DataTable({ config, rows }: { config: TableConfig; rows: Row[] }) {
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<string | null>(null)
+  const [quickFilter, setQuickFilter] = useState<number | null>(null)
   const [visibleKeys, setVisibleKeys] = useState<string[]>(config.listFields)
   const [sortKey, setSortKey] = useState<string | null>(null)
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc")
@@ -115,6 +116,12 @@ export function DataTable({ config, rows }: { config: TableConfig; rows: Row[] }
   const filteredRows = rows
     .filter((row) => {
       if (statusFilter && String(row.status ?? "") !== statusFilter) return false
+      if (quickFilter !== null) {
+        const filter = config.quickFilters![quickFilter]
+        const value = row[filter.field]
+        const isEmpty = value === null || value === undefined || value === ""
+        if (isEmpty !== filter.empty) return false
+      }
       if (!search.trim()) return true
       const haystack = visibleKeys.map((key) => cellText(row, key)).join(" ").toLowerCase()
       return haystack.includes(search.trim().toLowerCase())
@@ -159,6 +166,23 @@ export function DataTable({ config, rows }: { config: TableConfig; rows: Row[] }
                 onClick={() => setStatusFilter(status)}
               >
                 {status}
+              </FilterPill>
+            ))}
+          </div>
+        ) : null}
+
+        {config.quickFilters?.length ? (
+          <div className="flex flex-wrap gap-1.5">
+            <FilterPill active={quickFilter === null} onClick={() => setQuickFilter(null)}>
+              All
+            </FilterPill>
+            {config.quickFilters.map((filter, index) => (
+              <FilterPill
+                key={filter.label}
+                active={quickFilter === index}
+                onClick={() => setQuickFilter(index)}
+              >
+                {filter.label}
               </FilterPill>
             ))}
           </div>

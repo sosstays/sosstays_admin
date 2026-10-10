@@ -13,6 +13,7 @@ import {
   Store,
   Briefcase,
   Mail,
+  BellRing,
   LogOut,
 } from "lucide-react"
 import { logout } from "@/lib/auth/actions"
@@ -32,6 +33,7 @@ const links = [
   { href: "/contacts", label: "Contacts", icon: Contact },
   { href: "/properties", label: "Properties", icon: Building2 },
   { href: "/guests", label: "Guests", icon: Users },
+  { href: "/concierge", label: "Concierge", icon: BellRing },
   { href: "/bookings", label: "Bookings", icon: CalendarDays },
   { href: "/leads", label: "Landlord Leads", icon: Handshake },
   { href: "/partner-leads", label: "Partner Leads", icon: Store },

@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { tableConfigs, type TableKey } from "./config"
-import { updateRow, insertRow, deleteRow } from "./queries"
+import { updateRow, insertRow, deleteRow, getRow } from "./queries"
+import { recordActivity } from "@/lib/activities"
 import type { FieldConfig } from "./types"
 
 export interface UpdateState {
@@ -50,11 +51,18 @@ export async function updateRecord(
   const config = tableConfigs[tableKey]
   const patch = parseFormData(config.fields, formData)
 
+  // Lead tables log stage changes made through the edit form too.
+  const newStatus = typeof patch.status === "string" ? patch.status : null
+  const trackStage = newStatus !== null && PIPELINE_TABLES.has(tableKey)
+
+  let previous: Record<string, unknown> | null = null
   try {
+    if (trackStage) previous = await getRow(tableKey, id)
     await updateRow(tableKey, id, patch)
   } catch (err) {
     return { error: err instanceof Error ? err.message : "Failed to save changes." }
   }
+  if (trackStage && newStatus) await logStageChange(tableKey, id, previous, newStatus)
 
   revalidatePath(`${config.route}/${id}`)
   revalidatePath(config.route)
@@ -103,6 +111,36 @@ export async function deleteRecord(tableKey: TableKey, id: string): Promise<Upda
   redirect(config.route)
 }
 
+/**
+ * Best-effort: records "Stage changed: a -> b" on the contact timeline. A
+ * logging problem (or the activity table not existing yet) must never fail
+ * the status change itself.
+ */
+async function logStageChange(
+  tableKey: TableKey,
+  id: string,
+  previous: Record<string, unknown> | null,
+  next: string
+) {
+  const before = previous?.status
+  if (typeof before !== "string" || before === next) return
+  try {
+    await recordActivity({
+      email: typeof previous?.email === "string" ? previous.email : null,
+      record_table: tableKey,
+      record_id: id,
+      channel: "system",
+      type: "stage_change",
+      status: "logged",
+      title: `Stage changed: ${before} → ${next}`,
+      metadata: { from: before, to: next },
+      created_by: "admin",
+    })
+  } catch (err) {
+    console.error("Failed to log stage change", err)
+  }
+}
+
 const PIPELINE_TABLES = new Set<string>(["landlord_leads", "partner_leads", "corporate_leads"])
 const PIPELINE_STAGES = ["new", "contacted", "qualified", "converted", "declined"]
 
@@ -123,11 +161,14 @@ export async function setRowStatus(
     return { error: "Invalid pipeline stage." }
   }
 
+  let previous: Record<string, unknown> | null = null
   try {
+    previous = await getRow(tableKey, id)
     await updateRow(tableKey, id, { status })
   } catch (err) {
     return { error: err instanceof Error ? err.message : "Failed to update status." }
   }
+  await logStageChange(tableKey, id, previous, status)
 
   revalidatePath(`${config.route}/${id}`)
   revalidatePath(config.route)

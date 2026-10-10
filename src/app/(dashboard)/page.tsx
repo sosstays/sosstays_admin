@@ -13,6 +13,7 @@ import {
 import { countRows, listRows } from "@/lib/tables/queries"
 import { formatValue } from "@/lib/tables/format"
 import { StatusBadge } from "@/components/status-badge"
+import { NeedsAttention } from "@/components/needs-attention"
 
 const STAT_ICONS = {
   properties: Building2,
@@ -82,6 +83,8 @@ export default async function DashboardHomePage() {
           statKey="newsletter_subscribers"
         />
       </div>
+
+      <NeedsAttention />
 
       <div>
         <h2 className="section-title mb-3 text-lg font-semibold text-[var(--ink)]">

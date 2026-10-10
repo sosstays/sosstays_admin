@@ -1,8 +1,18 @@
 import type { TableKey } from "@/lib/tables/config"
 import { tableConfigs } from "@/lib/tables/config"
 import type { Row } from "@/lib/tables/queries"
+import type { Activity } from "@/lib/activities"
 
-export type TimelineKind = "profile" | "booking" | "message" | "lead" | "newsletter" | "sync"
+export type TimelineKind =
+  | "profile"
+  | "booking"
+  | "message"
+  | "lead"
+  | "newsletter"
+  | "sync"
+  | "call"
+  | "note"
+  | "system"
 
 export interface TimelineEvent {
   id: string
@@ -13,6 +23,31 @@ export interface TimelineEvent {
   detail?: string
   /** Record this event belongs to, for click-through. */
   href?: string
+  /** Set for logged activities: "failed" / "skipped" are surfaced as problems. */
+  status?: string
+  error?: string
+  /** Who logged it (manual entries only). */
+  author?: string
+  /** True when this came from the activities table rather than a derived column. */
+  logged?: boolean
+}
+
+const CHANNEL_KIND: Record<Activity["channel"], TimelineKind> = {
+  whatsapp: "message",
+  email: "message",
+  sms: "message",
+  call: "call",
+  note: "note",
+  system: "system",
+}
+
+function activityHref(activity: Activity): string | undefined {
+  if (activity.booking_id) return `/bookings/${activity.booking_id}`
+  if (activity.record_table && activity.record_id) {
+    const config = tableConfigs[activity.record_table as TableKey]
+    if (config) return `${config.route}/${activity.record_id}`
+  }
+  return undefined
 }
 
 const LEAD_LABELS: Partial<Record<TableKey, string>> = {
@@ -42,9 +77,18 @@ function truncate(text: string, max = 140): string {
  */
 export function buildTimeline(
   sections: { table: TableKey; rows: Row[] }[],
-  bookings: Row[]
+  bookings: Row[],
+  activities: Activity[] = []
 ): TimelineEvent[] {
   const events: TimelineEvent[] = []
+
+  // A logged confirmation/reminder is the better record of that send than the
+  // booking's *_sent_at column, so don't show both.
+  const loggedSends = new Set(
+    activities
+      .filter((a) => a.booking_id && a.status === "sent")
+      .map((a) => `${a.booking_id}:${a.type}`)
+  )
 
   function add(
     table: TableKey,
@@ -111,8 +155,27 @@ export function buildTimeline(
     const dates = [str(booking.check_in), str(booking.check_out)].filter(Boolean).join(" → ")
     const detail = [dates, str(booking.channel)].filter(Boolean).join(" · ")
     add("bookings", booking, "created_at", "booking", `Booking created at ${where}`, detail)
-    add("bookings", booking, "confirmation_sent_at", "message", "WhatsApp booking confirmation sent", where)
-    add("bookings", booking, "reminder_sent_at", "message", "WhatsApp check-in reminder sent", where)
+    if (!loggedSends.has(`${booking.id}:confirmation`)) {
+      add("bookings", booking, "confirmation_sent_at", "message", "WhatsApp booking confirmation sent", where)
+    }
+    if (!loggedSends.has(`${booking.id}:reminder`)) {
+      add("bookings", booking, "reminder_sent_at", "message", "WhatsApp check-in reminder sent", where)
+    }
+  }
+
+  for (const activity of activities) {
+    events.push({
+      id: `activity:${activity.id}`,
+      at: activity.occurred_at,
+      kind: CHANNEL_KIND[activity.channel] ?? "system",
+      title: activity.title,
+      detail: activity.body ?? undefined,
+      href: activityHref(activity),
+      status: activity.status,
+      error: activity.error ?? undefined,
+      author: activity.channel === "note" || activity.channel === "call" ? (activity.created_by ?? undefined) : undefined,
+      logged: true,
+    })
   }
 
   return events.sort((a, b) => b.at.localeCompare(a.at))

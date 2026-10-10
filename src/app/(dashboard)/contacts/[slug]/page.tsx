@@ -3,6 +3,7 @@ import { DetailHeader } from "@/components/detail-header"
 import { RelatedList } from "@/components/related-list"
 import { ActivityTimeline } from "@/components/activity-timeline"
 import { buildTimeline } from "@/lib/timeline"
+import { listActivities } from "@/lib/activities"
 import { getContact, listByEmail, ROLE_LABELS } from "@/lib/contacts"
 import { formatValue } from "@/lib/tables/format"
 import { listRelated } from "@/lib/tables/queries"
@@ -71,7 +72,11 @@ export default async function ContactDetailPage({
     await Promise.all(guestRows.map((g) => listRelated("bookings", "guest_id", String(g.id))))
   ).flat()
 
-  const events = buildTimeline(sections, bookings)
+  const activities = await listActivities(
+    contact.email,
+    bookings.map((b) => String(b.id))
+  )
+  const events = buildTimeline(sections, bookings, activities)
 
   return (
     <div className="flex flex-col gap-6">
@@ -100,7 +105,7 @@ export default async function ContactDetailPage({
         </div>
       </div>
 
-      <ActivityTimeline events={events} />
+      <ActivityTimeline events={events} email={contact.email} />
 
       {sections
         .filter((s) => s.rows.length > 0)

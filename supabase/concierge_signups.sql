@@ -1,7 +1,7 @@
 -- Concierge sign-ups: everyone who passes the name/email gate on a property's
 -- concierge site, whether or not they arrived with a booking link.
--- NOT applied to production yet. Review, then apply via Supabase (following the
--- snapshot-first rule in SOS-Database/DEPLOYED.md).
+-- Applied to production 2026-10-10 as migration "concierge_signups" (see
+-- SOS-Database/DEPLOYED.md for the deploy rules).
 
 create table public.concierge_signups (
   id uuid primary key default gen_random_uuid(),

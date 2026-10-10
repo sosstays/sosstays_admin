@@ -1,13 +1,13 @@
-# Concierge sign-up capture (not deployed)
+# Concierge sign-up capture
 
 The Concierge tab reads `concierge_signups`. Today the concierge gate
 (`SOS-Concierge/script.js`) only writes to Supabase when the URL carries a
 `?bookingid=`; guests who log in from the homepage go to Netlify Forms (and
 MailerLite if opted in) only. Three pieces make them visible:
 
-1. Run `supabase/concierge_signups.sql` (table + RLS, no policies).
-2. Deploy the `concierge-signup` edge function below (`verify_jwt = false`, like `link-booking`).
-3. Patch the concierge site to call it on every gate submit.
+1. DONE (2026-10-10): `supabase/concierge_signups.sql` applied (table + RLS, no policies).
+2. DONE (2026-10-10): `concierge-signup` edge function deployed, v1, `verify_jwt = false`.
+3. TODO: patch the concierge site to call it on every gate submit.
 
 Per `SOS-Database/DEPLOYED.md`: snapshot the live schema first, apply one change at a time, log it in `DEPLOY_LOG.md`.
 

@@ -102,3 +102,34 @@ export async function deleteRecord(tableKey: TableKey, id: string): Promise<Upda
   revalidatePath(config.route)
   redirect(config.route)
 }
+
+const PIPELINE_TABLES = new Set<string>(["landlord_leads", "partner_leads", "corporate_leads"])
+const PIPELINE_STAGES = ["new", "contacted", "qualified", "converted", "declined"]
+
+/**
+ * One-field update used by the pipeline board to move a lead between
+ * stages without going through a full edit form.
+ */
+export async function setRowStatus(
+  tableKey: TableKey,
+  id: string,
+  status: string
+): Promise<UpdateState> {
+  const config = tableConfigs[tableKey]
+
+  // Only the lead tables share this pipeline; reject anything else so the
+  // action can't be used to write arbitrary statuses to other tables.
+  if (!PIPELINE_TABLES.has(tableKey) || !PIPELINE_STAGES.includes(status)) {
+    return { error: "Invalid pipeline stage." }
+  }
+
+  try {
+    await updateRow(tableKey, id, { status })
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to update status." }
+  }
+
+  revalidatePath(`${config.route}/${id}`)
+  revalidatePath(config.route)
+  return { success: true }
+}

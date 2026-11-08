@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
-import { Search, Columns3, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
+import { Search, Columns3, ArrowUpDown, ArrowUp, ArrowDown, Download } from "lucide-react"
 import {
   Table,
   TableBody,
@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { getField, type TableConfig } from "@/lib/tables/types"
 import { formatValue } from "@/lib/tables/format"
+import { downloadCsv, toCsv } from "@/lib/csv"
 import { StatusBadge } from "@/components/status-badge"
 import type { Row } from "@/lib/tables/queries"
 
@@ -128,6 +129,25 @@ export function DataTable({ config, rows }: { config: TableConfig; rows: Row[] }
     })
     .sort((a, b) => (sortKey ? compareRows(a, b, sortKey) : 0))
 
+  /** Raw-ish value for the CSV: ISO dates and plain numbers, not the display formatting. */
+  function csvValue(row: Row, key: string): string {
+    if (relationByField.has(key)) return cellText(row, key)
+    const value = row[key]
+    if (value === null || value === undefined) return ""
+    const type = getField(config, key).type
+    return type === "boolean" ? (value ? "Yes" : "No") : String(value)
+  }
+
+  // Exports what's on screen: the visible columns, for the rows left after
+  // search/filters, in the current sort order.
+  function exportCsv() {
+    const csv = toCsv(
+      visibleKeys.map((key) => getField(config, key).label),
+      filteredRows.map((row) => visibleKeys.map((key) => csvValue(row, key)))
+    )
+    downloadCsv(`${config.key}-${new Date().toISOString().slice(0, 10)}.csv`, csv)
+  }
+
   function toggleHeaderSort(key: string) {
     if (sortKey !== key) {
       setSortKey(key)
@@ -223,6 +243,18 @@ export function DataTable({ config, rows }: { config: TableConfig; rows: Row[] }
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5"
+          disabled={filteredRows.length === 0}
+          onClick={exportCsv}
+          title={`Download ${filteredRows.length} row${filteredRows.length === 1 ? "" : "s"} as CSV`}
+        >
+          <Download className="h-4 w-4" strokeWidth={1.9} />
+          Export CSV
+        </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger

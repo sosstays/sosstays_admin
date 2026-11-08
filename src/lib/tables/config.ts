@@ -60,7 +60,15 @@ const guests: TableConfig = {
   pluralLabel: "Guests",
   route: "/guests",
   primaryKey: "id",
-  listFields: ["first_name", "last_name", "email", "phone", "email_verified", "created_at"],
+  listFields: [
+    "first_name",
+    "last_name",
+    "email",
+    "phone",
+    "email_verified",
+    "email_reliable",
+    "created_at",
+  ],
   avatarFields: ["first_name", "last_name"],
   fields: [
     { key: "id", label: "ID", type: "uuid", editable: false },
@@ -73,6 +81,12 @@ const guests: TableConfig = {
       label: "Email verified",
       type: "boolean",
       editable: true,
+    },
+    {
+      key: "email_reliable",
+      label: "Email reliable",
+      type: "boolean",
+      editable: false,
     },
     {
       key: "mailerlite_synced_at",

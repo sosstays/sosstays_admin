@@ -11,6 +11,23 @@ export interface Contact {
   touchpoints: number
   first_seen: string | null
   last_seen: string | null
+  /** Guests only: true if any guest row for this email has logged in to the concierge; null with no guest row. */
+  email_verified: boolean | null
+  /** True when the email is the person's own address, not an OTA relay or test domain. */
+  email_reliable: boolean
+}
+
+/**
+ * Same rule as guests.email_reliable (migration 0019) and the uplisting-webhook:
+ * OTA relay addresses (e.g. xyz@guest.booking.com) and test domains aren't reliable.
+ */
+export function isReliableEmail(email: string | null): boolean {
+  const e = (email ?? "").trim().toLowerCase()
+  if (!e.includes("@")) return false
+  const domain = e.split("@").pop()!
+  if (/(^|\.)(booking|airbnb|vrbo|homeaway|expedia)\.com$/.test(domain)) return false
+  if (/(^|\.)example\.(com|org|net)$/.test(domain)) return false
+  return true
 }
 
 /**
@@ -25,7 +42,25 @@ export async function listContacts(): Promise<Contact[]> {
     .order("last_seen", { ascending: false, nullsFirst: false })
 
   if (error) throw new Error(`Failed to list contacts: ${error.message}`)
-  return (data ?? []).map(toContact)
+
+  // email_verified (logged in to the concierge) lives on guests; the view doesn't carry it.
+  const { data: guests, error: guestError } = await supabaseAdmin
+    .from("guests")
+    .select("email, email_verified")
+  if (guestError) throw new Error(`Failed to load guest email status: ${guestError.message}`)
+
+  const verified = new Map<string, boolean>()
+  for (const g of guests ?? []) {
+    if (!g.email) continue
+    const key = g.email.toLowerCase()
+    verified.set(key, (verified.get(key) ?? false) || g.email_verified === true)
+  }
+
+  return (data ?? []).map((row) => ({
+    ...toContact(row),
+    email_verified: verified.get((row.email ?? "").toLowerCase()) ?? null,
+    email_reliable: isReliableEmail(row.email),
+  }))
 }
 
 export async function getContact(email: string): Promise<Contact | null> {
@@ -36,7 +71,9 @@ export async function getContact(email: string): Promise<Contact | null> {
     .maybeSingle()
 
   if (error) throw new Error(`Failed to load contact: ${error.message}`)
-  return data ? toContact(data) : null
+  return data
+    ? { ...toContact(data), email_verified: null, email_reliable: isReliableEmail(data.email) }
+    : null
 }
 
 /** Every row in `tableKey` for this email (case-insensitive — older rows may not be lowercased). */
@@ -64,7 +101,7 @@ function toContact(row: {
   touchpoints: number | null
   first_seen: string | null
   last_seen: string | null
-}): Contact {
+}): Omit<Contact, "email_verified" | "email_reliable"> {
   return {
     email: row.email ?? "",
     name: row.name,

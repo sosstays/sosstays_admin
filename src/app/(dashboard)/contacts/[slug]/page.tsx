@@ -14,7 +14,7 @@ const SECTIONS: { table: TableKey; label: string; columns: string[] }[] = [
   {
     table: "guests",
     label: "Guest profile",
-    columns: ["first_name", "last_name", "phone", "email_verified", "created_at"],
+    columns: ["first_name", "last_name", "phone", "email_verified", "email_reliable", "created_at"],
   },
   {
     table: "landlord_leads",
@@ -72,6 +72,10 @@ export default async function ContactDetailPage({
     await Promise.all(guestRows.map((g) => listRelated("bookings", "guest_id", String(g.id))))
   ).flat()
 
+  // Verified = logged in to the concierge with this email (only tracked on guest rows).
+  const emailVerified =
+    guestRows.length === 0 ? "—" : guestRows.some((g) => g.email_verified === true) ? "Yes" : "No"
+
   const activities = await listActivities(
     contact.email,
     bookings.map((b) => String(b.id))
@@ -89,6 +93,8 @@ export default async function ContactDetailPage({
       <div className="rounded-2xl border border-[var(--border-soft)] bg-white p-6">
         <dl className="grid gap-x-8 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
           <Fact label="Email" value={contact.email} />
+          <Fact label="Email verified" value={emailVerified} />
+          <Fact label="Email reliable" value={contact.email_reliable ? "Yes" : "No"} />
           <Fact label="Phone" value={contact.phone ?? "—"} />
           <Fact label="First seen" value={formatValue(contact.first_seen, "datetime")} />
           <Fact label="Last seen" value={formatValue(contact.last_seen, "datetime")} />

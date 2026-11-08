@@ -258,6 +258,7 @@ export type Database = {
           auth_user_id: string | null
           created_at: string | null
           email: string | null
+          email_reliable: boolean | null
           email_verified: boolean | null
           first_name: string | null
           id: string

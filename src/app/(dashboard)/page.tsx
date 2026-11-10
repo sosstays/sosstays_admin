@@ -12,7 +12,7 @@ import {
   MapPinned,
   Receipt,
 } from "lucide-react"
-import { countRows, listRows } from "@/lib/tables/queries"
+import { countRows, countPendingCorporateStaySubmissions, listRows } from "@/lib/tables/queries"
 import { formatValue } from "@/lib/tables/format"
 import { StatusBadge } from "@/components/status-badge"
 import { NeedsAttention } from "@/components/needs-attention"
@@ -42,6 +42,7 @@ export default async function DashboardHomePage() {
     corporateStayPropertyCount,
     corporateStayQuoteCount,
     subscriberCount,
+    pendingCorporateStaySubmissions,
     recentBookings,
   ] = await Promise.all([
     countRows("properties"),
@@ -54,6 +55,7 @@ export default async function DashboardHomePage() {
     countRows("corporate_stay_properties"),
     countRows("corporate_stay_quotes"),
     countRows("newsletter_subscribers"),
+    countPendingCorporateStaySubmissions(),
     listRows("bookings"),
   ])
 
@@ -61,6 +63,20 @@ export default async function DashboardHomePage() {
 
   return (
     <div className="flex flex-col gap-10">
+      {pendingCorporateStaySubmissions > 0 ? (
+        <Link
+          href="/corporate-stay-properties"
+          className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--maroon-muted)]/40 bg-[var(--warm-cream)] px-5 py-4 transition-colors hover:border-[var(--maroon-muted)]"
+        >
+          <span className="text-sm font-medium text-[var(--ink)]">
+            {pendingCorporateStaySubmissions} corporate stay{" "}
+            {pendingCorporateStaySubmissions === 1 ? "property" : "properties"} submitted by owners,
+            awaiting review
+          </span>
+          <ArrowRight className="h-4 w-4 shrink-0 text-[var(--maroon-muted)]" strokeWidth={2} />
+        </Link>
+      ) : null}
+
       <div className="grid gap-5 sm:grid-cols-3">
         <StatCard href="/properties" label="Properties" count={propertyCount} statKey="properties" />
         <StatCard href="/guests" label="Guests" count={guestCount} statKey="guests" />

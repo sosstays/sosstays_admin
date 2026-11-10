@@ -473,6 +473,7 @@ const corporateStayProperties: TableConfig = {
   route: "/corporate-stay-properties",
   primaryKey: "id",
   listFields: [
+    "submission_status",
     "property_name",
     "area",
     "county",
@@ -483,6 +484,21 @@ const corporateStayProperties: TableConfig = {
   ],
   fields: [
     { key: "id", label: "ID", type: "uuid", editable: false },
+    {
+      key: "submission_status",
+      label: "Submission status",
+      type: "select",
+      editable: true,
+      options: ["pending_review", "approved", "rejected"],
+    },
+    {
+      key: "public_listing_consent",
+      label: "Owner consented to public listing",
+      type: "select",
+      editable: true,
+      options: ["yes", "no", "not_asked"],
+    },
+    { key: "captured_by", label: "Captured by", type: "text", editable: true },
     { key: "property_name", label: "Property name", type: "text", editable: true },
     { key: "area", label: "Area", type: "text", editable: true },
     { key: "county", label: "County", type: "text", editable: true },
@@ -525,6 +541,10 @@ const corporateStayProperties: TableConfig = {
     },
   ],
   formGroups: [
+    {
+      label: "Review",
+      fields: ["submission_status", "public_listing_consent", "captured_by"],
+    },
     { label: "Property", fields: ["property_name", "area", "county", "listing_url", "photos_url"] },
     {
       label: "Capacity",

@@ -439,6 +439,7 @@ export type Database = {
           bedroom_breakdown: Json | null
           bedrooms: number | null
           beds_total: number | null
+          captured_by: string
           county: string | null
           created_at: string
           description: string | null
@@ -452,6 +453,8 @@ export type Database = {
           owner_phone: string | null
           photos_url: string | null
           property_name: string
+          public_listing_consent: string
+          submission_status: string
           updated_at: string
         }
         Insert: {
@@ -461,6 +464,7 @@ export type Database = {
           bedroom_breakdown?: Json | null
           bedrooms?: number | null
           beds_total?: number | null
+          captured_by?: string
           county?: string | null
           created_at?: string
           description?: string | null
@@ -474,6 +478,8 @@ export type Database = {
           owner_phone?: string | null
           photos_url?: string | null
           property_name: string
+          public_listing_consent?: string
+          submission_status?: string
           updated_at?: string
         }
         Update: {
@@ -483,6 +489,7 @@ export type Database = {
           bedroom_breakdown?: Json | null
           bedrooms?: number | null
           beds_total?: number | null
+          captured_by?: string
           county?: string | null
           created_at?: string
           description?: string | null
@@ -496,6 +503,8 @@ export type Database = {
           owner_phone?: string | null
           photos_url?: string | null
           property_name?: string
+          public_listing_consent?: string
+          submission_status?: string
           updated_at?: string
         }
         Relationships: []
@@ -504,6 +513,7 @@ export type Database = {
         Row: {
           billing_period: string | null
           booking_channel: string | null
+          captured_by: string
           cleaning_cost_extra_eur: number | null
           cleaning_included: string | null
           cleaning_runs_per_period: number | null
@@ -526,6 +536,7 @@ export type Database = {
         Insert: {
           billing_period?: string | null
           booking_channel?: string | null
+          captured_by?: string
           cleaning_cost_extra_eur?: number | null
           cleaning_included?: string | null
           cleaning_runs_per_period?: number | null
@@ -548,6 +559,7 @@ export type Database = {
         Update: {
           billing_period?: string | null
           booking_channel?: string | null
+          captured_by?: string
           cleaning_cost_extra_eur?: number | null
           cleaning_included?: string | null
           cleaning_runs_per_period?: number | null

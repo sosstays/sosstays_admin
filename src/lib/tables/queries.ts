@@ -122,6 +122,17 @@ export async function insertRow(tableKey: TableKey, data: Record<string, unknown
   return row as Row
 }
 
+/** Count of corporate stay properties awaiting review before they can appear in the public carousel. */
+export async function countPendingCorporateStaySubmissions(): Promise<number> {
+  const { count, error } = await supabaseAdmin
+    .from("corporate_stay_properties")
+    .select("*", { count: "exact", head: true })
+    .eq("submission_status", "pending_review")
+
+  if (error) throw new Error(`Failed to count pending corporate stay submissions: ${error.message}`)
+  return count ?? 0
+}
+
 export async function countRows(tableKey: TableKey): Promise<number> {
   const config = tableConfigs[tableKey]
   const { count, error } = await supabaseAdmin

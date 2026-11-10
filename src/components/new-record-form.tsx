@@ -11,9 +11,12 @@ import type { UpdateState } from "@/lib/tables/actions"
 export function NewRecordForm({
   config,
   action,
+  initialValues,
 }: {
   config: TableConfig
   action: (state: UpdateState, formData: FormData) => Promise<UpdateState>
+  /** Pre-fills a field's input, e.g. a FK passed in via the page's query string. */
+  initialValues?: Record<string, string>
 }) {
   const [state, formAction, pending] = useActionState(action, {})
   const editableFields = config.fields.filter((f) => f.editable)
@@ -53,7 +56,7 @@ export function NewRecordForm({
                   <select
                     id={field.key}
                     name={field.key}
-                    defaultValue={field.options?.[0] ?? ""}
+                    defaultValue={initialValues?.[field.key] ?? field.options?.[0] ?? ""}
                     className="h-9 rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus:border-[var(--sage)]"
                   >
                     {(field.options ?? []).map((option) => (
@@ -83,6 +86,7 @@ export function NewRecordForm({
                   name={field.key}
                   type={inputType}
                   step={field.type === "number" ? "0.01" : undefined}
+                  defaultValue={initialValues?.[field.key] ?? ""}
                 />
               </div>
             )

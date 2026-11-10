@@ -15,6 +15,8 @@ import {
   Mail,
   BellRing,
   LogOut,
+  MapPinned,
+  Receipt,
 } from "lucide-react"
 import { logout } from "@/lib/auth/actions"
 import { Logo } from "@/components/logo"
@@ -38,6 +40,8 @@ const links = [
   { href: "/leads", label: "Landlord Leads", icon: Handshake },
   { href: "/partner-leads", label: "Partner Leads", icon: Store },
   { href: "/corporate-leads", label: "Corporate Leads", icon: Briefcase },
+  { href: "/corporate-stay-properties", label: "Corporate Stay Properties", icon: MapPinned },
+  { href: "/corporate-stay-quotes", label: "Corporate Stay Quotes", icon: Receipt },
   { href: "/contact-queries", label: "Contact Queries", icon: MessageSquare },
   { href: "/newsletter", label: "Newsletter", icon: Mail },
 ]

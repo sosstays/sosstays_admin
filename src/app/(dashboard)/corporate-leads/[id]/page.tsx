@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation"
 import { RecordForm } from "@/components/record-form"
 import { DetailHeader } from "@/components/detail-header"
+import { CorporateMatchPanel } from "@/components/corporate-match-panel"
 import { tableConfigs } from "@/lib/tables/config"
-import { getRow } from "@/lib/tables/queries"
+import { getRow, listPropertyMatchesForLead } from "@/lib/tables/queries"
 import { updateRecord } from "@/lib/tables/actions"
 
 export default async function CorporateLeadDetailPage({
@@ -16,11 +17,18 @@ export default async function CorporateLeadDetailPage({
   if (!row) notFound()
 
   const action = updateRecord.bind(null, "corporate_leads", id)
+  const matches = await listPropertyMatchesForLead(id)
 
   return (
     <div className="flex flex-col gap-6">
       <DetailHeader backHref="/corporate-leads" backLabel="corporate leads" title={String(row.company ?? row.name ?? row.email)} />
       <RecordForm config={config} row={row} action={action} />
+      <CorporateMatchPanel
+        label="Suggested Properties"
+        emptyLabel="No close matches yet."
+        matches={matches}
+        variant="properties-for-lead"
+      />
     </div>
   )
 }

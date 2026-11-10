@@ -18,18 +18,33 @@ export function RelatedList({
   sourceTable,
   columns,
   rows,
+  addHref,
+  addLabel,
 }: {
   label: string
   sourceTable: TableKey
   columns: string[]
   rows: Row[]
+  /** Optional link to a page for adding a new related record (e.g. a new quote for this property). */
+  addHref?: string
+  addLabel?: string
 }) {
   const config = tableConfigs[sourceTable]
   const relationByField = new Map((config.relations ?? []).map((r) => [r.field, r]))
 
   return (
     <div className="rounded-2xl border border-[var(--border-soft)] bg-white p-6">
-      <h2 className="section-title mb-4 text-lg font-semibold text-[var(--ink)]">{label}</h2>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h2 className="section-title text-lg font-semibold text-[var(--ink)]">{label}</h2>
+        {addHref ? (
+          <Link
+            href={addHref}
+            className="rounded-lg bg-[var(--forest)] px-3 py-1.5 text-xs font-medium text-[var(--cream)] transition-colors hover:bg-[var(--forest-deep)]"
+          >
+            {addLabel ?? "Add"}
+          </Link>
+        ) : null}
+      </div>
       <div className="overflow-hidden overflow-x-auto rounded-xl border border-[var(--border-soft)]">
         <Table>
           <TableHeader>

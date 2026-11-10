@@ -12,6 +12,9 @@ const STYLES: Record<string, string> = {
   // Contact queries
   in_progress: "bg-[var(--sage-pale)] text-[var(--forest-deep)]",
   resolved: "bg-[var(--sage-300)] text-[var(--forest-deep)]",
+  // Corporate stay quotes
+  quoted: "bg-[var(--warm-cream)] text-[var(--maroon-muted)]",
+  expired: "bg-[var(--error-bg)] text-[var(--error)]",
 }
 
 const DEFAULT_STYLE = "bg-[var(--warm-cream)] text-[var(--ink-soft)]"

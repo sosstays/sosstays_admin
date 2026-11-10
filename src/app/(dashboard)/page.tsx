@@ -9,6 +9,8 @@ import {
   Briefcase,
   Mail,
   ArrowRight,
+  MapPinned,
+  Receipt,
 } from "lucide-react"
 import { countRows, listRows } from "@/lib/tables/queries"
 import { formatValue } from "@/lib/tables/format"
@@ -23,6 +25,8 @@ const STAT_ICONS = {
   contact_queries: MessageSquare,
   partner_leads: Store,
   corporate_leads: Briefcase,
+  corporate_stay_properties: MapPinned,
+  corporate_stay_quotes: Receipt,
   newsletter_subscribers: Mail,
 } as const
 
@@ -35,6 +39,8 @@ export default async function DashboardHomePage() {
     queryCount,
     partnerCount,
     corporateCount,
+    corporateStayPropertyCount,
+    corporateStayQuoteCount,
     subscriberCount,
     recentBookings,
   ] = await Promise.all([
@@ -45,6 +51,8 @@ export default async function DashboardHomePage() {
     countRows("contact_queries"),
     countRows("partner_leads"),
     countRows("corporate_leads"),
+    countRows("corporate_stay_properties"),
+    countRows("corporate_stay_quotes"),
     countRows("newsletter_subscribers"),
     listRows("bookings"),
   ])
@@ -75,6 +83,18 @@ export default async function DashboardHomePage() {
           label="Corporate Leads"
           count={corporateCount}
           statKey="corporate_leads"
+        />
+        <StatCard
+          href="/corporate-stay-properties"
+          label="Corporate Stay Properties"
+          count={corporateStayPropertyCount}
+          statKey="corporate_stay_properties"
+        />
+        <StatCard
+          href="/corporate-stay-quotes"
+          label="Corporate Stay Quotes"
+          count={corporateStayQuoteCount}
+          statKey="corporate_stay_quotes"
         />
         <StatCard
           href="/newsletter"

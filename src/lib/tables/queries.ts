@@ -132,6 +132,51 @@ export async function countRows(tableKey: TableKey): Promise<number> {
   return count ?? 0
 }
 
+export interface CorporateLeadPropertyMatch {
+  lead_id: string | null
+  location_needed: string | null
+  lead_company: string | null
+  lead_status: string | null
+  property_id: string | null
+  property_name: string | null
+  area: string | null
+  county: string | null
+  match_score: number | null
+}
+
+const MATCH_SCORE_THRESHOLD = 0.3
+
+/**
+ * Candidate corporate-stay properties for a lead, from the read-only
+ * `corporate_lead_property_matches` view (fuzzy-matched on location). Not a
+ * configured table — this view cross-joins two tables and doesn't fit the
+ * single-FK RelatedListConfig shape, so it's queried directly here instead.
+ */
+export async function listPropertyMatchesForLead(leadId: string): Promise<CorporateLeadPropertyMatch[]> {
+  const { data, error } = await supabaseAdmin
+    .from("corporate_lead_property_matches")
+    .select("*")
+    .eq("lead_id", leadId)
+    .gt("match_score", MATCH_SCORE_THRESHOLD)
+    .order("match_score", { ascending: false })
+
+  if (error) throw new Error(`Failed to list property matches for lead ${leadId}: ${error.message}`)
+  return (data ?? []) as CorporateLeadPropertyMatch[]
+}
+
+/** The reverse of listPropertyMatchesForLead: corporate leads interested in a given property's area. */
+export async function listLeadMatchesForProperty(propertyId: string): Promise<CorporateLeadPropertyMatch[]> {
+  const { data, error } = await supabaseAdmin
+    .from("corporate_lead_property_matches")
+    .select("*")
+    .eq("property_id", propertyId)
+    .gt("match_score", MATCH_SCORE_THRESHOLD)
+    .order("match_score", { ascending: false })
+
+  if (error) throw new Error(`Failed to list lead matches for property ${propertyId}: ${error.message}`)
+  return (data ?? []) as CorporateLeadPropertyMatch[]
+}
+
 /** Deletes a single row by primary key. */
 export async function deleteRow(tableKey: TableKey, id: string): Promise<void> {
   const config = tableConfigs[tableKey]

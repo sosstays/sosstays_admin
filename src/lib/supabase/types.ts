@@ -7,11 +7,144 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.15"
   }
   public: {
     Tables: {
+      activities: {
+        Row: {
+          body: string | null
+          booking_id: string | null
+          channel: string
+          created_at: string
+          created_by: string | null
+          direction: string
+          email: string | null
+          error: string | null
+          external_id: string | null
+          id: string
+          metadata: Json
+          occurred_at: string
+          record_id: string | null
+          record_table: string | null
+          status: string
+          title: string
+          type: string
+        }
+        Insert: {
+          body?: string | null
+          booking_id?: string | null
+          channel: string
+          created_at?: string
+          created_by?: string | null
+          direction?: string
+          email?: string | null
+          error?: string | null
+          external_id?: string | null
+          id?: string
+          metadata?: Json
+          occurred_at?: string
+          record_id?: string | null
+          record_table?: string | null
+          status?: string
+          title: string
+          type: string
+        }
+        Update: {
+          body?: string | null
+          booking_id?: string | null
+          channel?: string
+          created_at?: string
+          created_by?: string | null
+          direction?: string
+          email?: string | null
+          error?: string | null
+          external_id?: string | null
+          id?: string
+          metadata?: Json
+          occurred_at?: string
+          record_id?: string | null
+          record_table?: string | null
+          status?: string
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activities_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bespoke_trip_leads: {
+        Row: {
+          accommodation_preference: string | null
+          base_or_route: string | null
+          consent: boolean | null
+          consent_at: string | null
+          created_at: string
+          email: string
+          event_type: string | null
+          group_size: string | null
+          id: string
+          ideal_month: string | null
+          interests: string | null
+          mailerlite_subscriber_id: string | null
+          mailerlite_synced_at: string | null
+          name: string | null
+          notes: string | null
+          phone: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          accommodation_preference?: string | null
+          base_or_route?: string | null
+          consent?: boolean | null
+          consent_at?: string | null
+          created_at?: string
+          email: string
+          event_type?: string | null
+          group_size?: string | null
+          id?: string
+          ideal_month?: string | null
+          interests?: string | null
+          mailerlite_subscriber_id?: string | null
+          mailerlite_synced_at?: string | null
+          name?: string | null
+          notes?: string | null
+          phone?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          accommodation_preference?: string | null
+          base_or_route?: string | null
+          consent?: boolean | null
+          consent_at?: string | null
+          created_at?: string
+          email?: string
+          event_type?: string | null
+          group_size?: string | null
+          id?: string
+          ideal_month?: string | null
+          interests?: string | null
+          mailerlite_subscriber_id?: string | null
+          mailerlite_synced_at?: string | null
+          name?: string | null
+          notes?: string | null
+          phone?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           arrival_time: string | null
@@ -26,8 +159,10 @@ export type Database = {
           id: string
           lock_code: string | null
           ota_email: string | null
+          ota_email_reliable: boolean
           ota_phone: string | null
           ota_phone_reliable: boolean | null
+          post_stay_sent_at: string | null
           property_id: string | null
           reminder_sent_at: string | null
           revenue: number | null
@@ -48,8 +183,10 @@ export type Database = {
           id?: string
           lock_code?: string | null
           ota_email?: string | null
+          ota_email_reliable?: boolean
           ota_phone?: string | null
           ota_phone_reliable?: boolean | null
+          post_stay_sent_at?: string | null
           property_id?: string | null
           reminder_sent_at?: string | null
           revenue?: number | null
@@ -70,8 +207,10 @@ export type Database = {
           id?: string
           lock_code?: string | null
           ota_email?: string | null
+          ota_email_reliable?: boolean
           ota_phone?: string | null
           ota_phone_reliable?: boolean | null
+          post_stay_sent_at?: string | null
           property_id?: string | null
           reminder_sent_at?: string | null
           revenue?: number | null
@@ -162,39 +301,51 @@ export type Database = {
       }
       contact_queries: {
         Row: {
+          consent: boolean | null
+          consent_at: string | null
           created_at: string
           email: string
+          how_heard: string | null
           id: string
           mailerlite_subscriber_id: string | null
           mailerlite_synced_at: string | null
           message: string | null
           name: string | null
+          phone: string | null
           property_name: string | null
           status: string
           topic: string | null
           updated_at: string
         }
         Insert: {
+          consent?: boolean | null
+          consent_at?: string | null
           created_at?: string
           email: string
+          how_heard?: string | null
           id?: string
           mailerlite_subscriber_id?: string | null
           mailerlite_synced_at?: string | null
           message?: string | null
           name?: string | null
+          phone?: string | null
           property_name?: string | null
           status?: string
           topic?: string | null
           updated_at?: string
         }
         Update: {
+          consent?: boolean | null
+          consent_at?: string | null
           created_at?: string
           email?: string
+          how_heard?: string | null
           id?: string
           mailerlite_subscriber_id?: string | null
           mailerlite_synced_at?: string | null
           message?: string | null
           name?: string | null
+          phone?: string | null
           property_name?: string | null
           status?: string
           topic?: string | null
@@ -205,49 +356,298 @@ export type Database = {
       corporate_leads: {
         Row: {
           company: string | null
+          consent: boolean | null
+          consent_at: string | null
           created_at: string
           duration: string | null
           email: string
+          end_date: string | null
+          how_heard: string | null
           id: string
           location_needed: string | null
+          location_preference: string | null
           mailerlite_subscriber_id: string | null
           mailerlite_synced_at: string | null
           message: string | null
           name: string | null
           number_of_workers: string | null
+          other_requirements: string | null
           phone: string | null
+          room_preference: string | null
+          schedule_preference: string | null
+          start_date: string | null
           status: string
           updated_at: string
         }
         Insert: {
           company?: string | null
+          consent?: boolean | null
+          consent_at?: string | null
           created_at?: string
           duration?: string | null
           email: string
+          end_date?: string | null
+          how_heard?: string | null
           id?: string
           location_needed?: string | null
+          location_preference?: string | null
           mailerlite_subscriber_id?: string | null
           mailerlite_synced_at?: string | null
           message?: string | null
           name?: string | null
           number_of_workers?: string | null
+          other_requirements?: string | null
           phone?: string | null
+          room_preference?: string | null
+          schedule_preference?: string | null
+          start_date?: string | null
           status?: string
           updated_at?: string
         }
         Update: {
           company?: string | null
+          consent?: boolean | null
+          consent_at?: string | null
           created_at?: string
           duration?: string | null
           email?: string
+          end_date?: string | null
+          how_heard?: string | null
           id?: string
           location_needed?: string | null
+          location_preference?: string | null
           mailerlite_subscriber_id?: string | null
           mailerlite_synced_at?: string | null
           message?: string | null
           name?: string | null
           number_of_workers?: string | null
+          other_requirements?: string | null
           phone?: string | null
+          room_preference?: string | null
+          schedule_preference?: string | null
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      corporate_stay_properties: {
+        Row: {
+          amenities: string | null
+          area: string | null
+          bathrooms: number | null
+          bedroom_breakdown: Json | null
+          bedrooms: number | null
+          beds_total: number | null
+          county: string | null
+          created_at: string
+          description: string | null
+          id: string
+          listing_url: string | null
+          max_guests_extended: number | null
+          max_guests_standard: number | null
+          notes: string | null
+          owner_email: string | null
+          owner_name: string | null
+          owner_phone: string | null
+          photos_url: string | null
+          property_name: string
+          updated_at: string
+        }
+        Insert: {
+          amenities?: string | null
+          area?: string | null
+          bathrooms?: number | null
+          bedroom_breakdown?: Json | null
+          bedrooms?: number | null
+          beds_total?: number | null
+          county?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          listing_url?: string | null
+          max_guests_extended?: number | null
+          max_guests_standard?: number | null
+          notes?: string | null
+          owner_email?: string | null
+          owner_name?: string | null
+          owner_phone?: string | null
+          photos_url?: string | null
+          property_name: string
+          updated_at?: string
+        }
+        Update: {
+          amenities?: string | null
+          area?: string | null
+          bathrooms?: number | null
+          bedroom_breakdown?: Json | null
+          bedrooms?: number | null
+          beds_total?: number | null
+          county?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          listing_url?: string | null
+          max_guests_extended?: number | null
+          max_guests_standard?: number | null
+          notes?: string | null
+          owner_email?: string | null
+          owner_name?: string | null
+          owner_phone?: string | null
+          photos_url?: string | null
+          property_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      corporate_stay_quotes: {
+        Row: {
+          billing_period: string | null
+          booking_channel: string | null
+          cleaning_cost_extra_eur: number | null
+          cleaning_included: string | null
+          cleaning_runs_per_period: number | null
+          client_price_eur: number | null
+          created_at: string
+          id: string
+          markup_pct: number
+          notes: string | null
+          occupancy_guests: string | null
+          owner_quote_eur: number | null
+          property_id: string
+          quote_captured_at: string
+          source_contact: string | null
+          status: string
+          stay_end: string | null
+          stay_start: string | null
+          updated_at: string
+          week_basis: string | null
+        }
+        Insert: {
+          billing_period?: string | null
+          booking_channel?: string | null
+          cleaning_cost_extra_eur?: number | null
+          cleaning_included?: string | null
+          cleaning_runs_per_period?: number | null
+          client_price_eur?: number | null
+          created_at?: string
+          id?: string
+          markup_pct?: number
+          notes?: string | null
+          occupancy_guests?: string | null
+          owner_quote_eur?: number | null
+          property_id: string
+          quote_captured_at?: string
+          source_contact?: string | null
+          status?: string
+          stay_end?: string | null
+          stay_start?: string | null
+          updated_at?: string
+          week_basis?: string | null
+        }
+        Update: {
+          billing_period?: string | null
+          booking_channel?: string | null
+          cleaning_cost_extra_eur?: number | null
+          cleaning_included?: string | null
+          cleaning_runs_per_period?: number | null
+          client_price_eur?: number | null
+          created_at?: string
+          id?: string
+          markup_pct?: number
+          notes?: string | null
+          occupancy_guests?: string | null
+          owner_quote_eur?: number | null
+          property_id?: string
+          quote_captured_at?: string
+          source_contact?: string | null
+          status?: string
+          stay_end?: string | null
+          stay_start?: string | null
+          updated_at?: string
+          week_basis?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corporate_stay_quotes_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "corporate_lead_property_matches"
+            referencedColumns: ["property_id"]
+          },
+          {
+            foreignKeyName: "corporate_stay_quotes_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "corporate_stay_properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gift_maker_leads: {
+        Row: {
+          billing_type: string | null
+          budget_per_gift: number | null
+          consent: boolean | null
+          consent_at: string | null
+          created_at: string
+          delivery_method: string | null
+          email: string
+          format: string | null
+          id: string
+          mailerlite_subscriber_id: string | null
+          mailerlite_synced_at: string | null
+          name: string | null
+          package_items: string | null
+          package_label: string | null
+          package_total: number | null
+          phone: string | null
+          quantity: string | null
+          recipient_type: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          billing_type?: string | null
+          budget_per_gift?: number | null
+          consent?: boolean | null
+          consent_at?: string | null
+          created_at?: string
+          delivery_method?: string | null
+          email: string
+          format?: string | null
+          id?: string
+          mailerlite_subscriber_id?: string | null
+          mailerlite_synced_at?: string | null
+          name?: string | null
+          package_items?: string | null
+          package_label?: string | null
+          package_total?: number | null
+          phone?: string | null
+          quantity?: string | null
+          recipient_type?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          billing_type?: string | null
+          budget_per_gift?: number | null
+          consent?: boolean | null
+          consent_at?: string | null
+          created_at?: string
+          delivery_method?: string | null
+          email?: string
+          format?: string | null
+          id?: string
+          mailerlite_subscriber_id?: string | null
+          mailerlite_synced_at?: string | null
+          name?: string | null
+          package_items?: string | null
+          package_label?: string | null
+          package_total?: number | null
+          phone?: string | null
+          quantity?: string | null
+          recipient_type?: string | null
           status?: string
           updated_at?: string
         }
@@ -270,6 +670,7 @@ export type Database = {
           auth_user_id?: string | null
           created_at?: string | null
           email?: string | null
+          email_reliable?: boolean | null
           email_verified?: boolean | null
           first_name?: string | null
           id?: string
@@ -281,6 +682,7 @@ export type Database = {
           auth_user_id?: string | null
           created_at?: string | null
           email?: string | null
+          email_reliable?: boolean | null
           email_verified?: boolean | null
           first_name?: string | null
           id?: string
@@ -297,6 +699,8 @@ export type Database = {
           bedrooms: string | null
           biggest_challenge: string | null
           company: string | null
+          consent: boolean | null
+          consent_at: string | null
           created_at: string
           current_revenue: number | null
           email: string
@@ -327,6 +731,8 @@ export type Database = {
           bedrooms?: string | null
           biggest_challenge?: string | null
           company?: string | null
+          consent?: boolean | null
+          consent_at?: string | null
           created_at?: string
           current_revenue?: number | null
           email: string
@@ -357,6 +763,8 @@ export type Database = {
           bedrooms?: string | null
           biggest_challenge?: string | null
           company?: string | null
+          consent?: boolean | null
+          consent_at?: string | null
           created_at?: string
           current_revenue?: number | null
           email?: string
@@ -429,6 +837,8 @@ export type Database = {
           about_business: string | null
           business_name: string | null
           category: string | null
+          consent: boolean | null
+          consent_at: string | null
           contact_name: string | null
           created_at: string
           email: string
@@ -446,6 +856,8 @@ export type Database = {
           about_business?: string | null
           business_name?: string | null
           category?: string | null
+          consent?: boolean | null
+          consent_at?: string | null
           contact_name?: string | null
           created_at?: string
           email: string
@@ -463,6 +875,8 @@ export type Database = {
           about_business?: string | null
           business_name?: string | null
           category?: string | null
+          consent?: boolean | null
+          consent_at?: string | null
           contact_name?: string | null
           created_at?: string
           email?: string
@@ -485,6 +899,7 @@ export type Database = {
           id: string
           name: string
           nickname: string | null
+          public_name: string | null
           uplisting_listing_id: string
         }
         Insert: {
@@ -493,6 +908,7 @@ export type Database = {
           id?: string
           name: string
           nickname?: string | null
+          public_name?: string | null
           uplisting_listing_id: string
         }
         Update: {
@@ -501,9 +917,213 @@ export type Database = {
           id?: string
           name?: string
           nickname?: string | null
+          public_name?: string | null
           uplisting_listing_id?: string
         }
         Relationships: []
+      }
+      shop_orders: {
+        Row: {
+          amount_total: number | null
+          arrival_date: string | null
+          buyer_email: string
+          buyer_name: string | null
+          buyer_phone: string | null
+          created_at: string
+          currency: string | null
+          delivery_address: string | null
+          delivery_method: string | null
+          delivery_postcode: string | null
+          fulfilment_status: string
+          gift_note: string | null
+          id: string
+          product_id: string | null
+          product_kind: string
+          product_name: string
+          property_name: string | null
+          property_slug: string | null
+          quantity: number
+          receipt_sent_at: string | null
+          recipient_email: string | null
+          recipient_name: string | null
+          stay_date_type: string | null
+          stripe_payment_intent_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount_total?: number | null
+          arrival_date?: string | null
+          buyer_email: string
+          buyer_name?: string | null
+          buyer_phone?: string | null
+          created_at?: string
+          currency?: string | null
+          delivery_address?: string | null
+          delivery_method?: string | null
+          delivery_postcode?: string | null
+          fulfilment_status?: string
+          gift_note?: string | null
+          id?: string
+          product_id?: string | null
+          product_kind: string
+          product_name: string
+          property_name?: string | null
+          property_slug?: string | null
+          quantity: number
+          receipt_sent_at?: string | null
+          recipient_email?: string | null
+          recipient_name?: string | null
+          stay_date_type?: string | null
+          stripe_payment_intent_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount_total?: number | null
+          arrival_date?: string | null
+          buyer_email?: string
+          buyer_name?: string | null
+          buyer_phone?: string | null
+          created_at?: string
+          currency?: string | null
+          delivery_address?: string | null
+          delivery_method?: string | null
+          delivery_postcode?: string | null
+          fulfilment_status?: string
+          gift_note?: string | null
+          id?: string
+          product_id?: string | null
+          product_kind?: string
+          product_name?: string
+          property_name?: string | null
+          property_slug?: string | null
+          quantity?: number
+          receipt_sent_at?: string | null
+          recipient_email?: string | null
+          recipient_name?: string | null
+          stay_date_type?: string | null
+          stripe_payment_intent_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      signatories: {
+        Row: {
+          confirm_token: string
+          confirmed_at: string | null
+          county: string
+          created_at: string
+          email: string
+          id: string
+          ip_hash: string | null
+          letter_version: string
+          name: string
+          publish_name: boolean
+          role: string
+          urban_or_rural: string | null
+          withdrawn_at: string | null
+        }
+        Insert: {
+          confirm_token?: string
+          confirmed_at?: string | null
+          county: string
+          created_at?: string
+          email: string
+          id?: string
+          ip_hash?: string | null
+          letter_version: string
+          name: string
+          publish_name?: boolean
+          role: string
+          urban_or_rural?: string | null
+          withdrawn_at?: string | null
+        }
+        Update: {
+          confirm_token?: string
+          confirmed_at?: string | null
+          county?: string
+          created_at?: string
+          email?: string
+          id?: string
+          ip_hash?: string | null
+          letter_version?: string
+          name?: string
+          publish_name?: boolean
+          role?: string
+          urban_or_rural?: string | null
+          withdrawn_at?: string | null
+        }
+        Relationships: []
+      }
+      sms_messages: {
+        Row: {
+          attempts: number
+          body: string
+          booking_id: string | null
+          created_at: string
+          dedupe_key: string | null
+          delivered_at: string | null
+          error_code: number | null
+          error_message: string | null
+          id: string
+          kind: string
+          last_attempt_at: string | null
+          num_segments: number | null
+          scheduled_for: string
+          sent_at: string | null
+          status: string
+          to_phone: string
+          twilio_sid: string | null
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          body: string
+          booking_id?: string | null
+          created_at?: string
+          dedupe_key?: string | null
+          delivered_at?: string | null
+          error_code?: number | null
+          error_message?: string | null
+          id?: string
+          kind: string
+          last_attempt_at?: string | null
+          num_segments?: number | null
+          scheduled_for?: string
+          sent_at?: string | null
+          status?: string
+          to_phone: string
+          twilio_sid?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          body?: string
+          booking_id?: string | null
+          created_at?: string
+          dedupe_key?: string | null
+          delivered_at?: string | null
+          error_code?: number | null
+          error_message?: string | null
+          id?: string
+          kind?: string
+          last_attempt_at?: string | null
+          num_segments?: number | null
+          scheduled_for?: string
+          sent_at?: string | null
+          status?: string
+          to_phone?: string
+          twilio_sid?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_messages_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -516,6 +1136,20 @@ export type Database = {
           phone: string | null
           roles: string[] | null
           touchpoints: number | null
+        }
+        Relationships: []
+      }
+      corporate_lead_property_matches: {
+        Row: {
+          area: string | null
+          county: string | null
+          lead_company: string | null
+          lead_id: string | null
+          lead_status: string | null
+          location_needed: string | null
+          match_score: number | null
+          property_id: string | null
+          property_name: string | null
         }
         Relationships: []
       }
@@ -538,7 +1172,8 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       [_ in never]: never

@@ -72,6 +72,8 @@ export interface TableConfig {
   formGroups?: FormGroupConfig[]
   /** Extra filter pills shown above the list, next to the status pills. */
   quickFilters?: QuickFilterConfig[]
+  /** Field keys (besides the literal "status" column) rendered as a StatusBadge pill in the list view. */
+  badgeFields?: string[]
 }
 
 export function getField(config: TableConfig, key: string): FieldConfig {

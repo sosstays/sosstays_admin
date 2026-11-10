@@ -15,6 +15,16 @@ const STYLES: Record<string, string> = {
   // Corporate stay quotes
   quoted: "bg-[var(--warm-cream)] text-[var(--maroon-muted)]",
   expired: "bg-[var(--error-bg)] text-[var(--error)]",
+  // Corporate stay properties — submission review
+  pending_review: "bg-[var(--warm-cream)] text-[var(--maroon-muted)]",
+  approved: "bg-[var(--sage-pale)] text-[var(--forest-deep)]",
+  rejected: "bg-[var(--error-bg)] text-[var(--error)]",
+  // Corporate stay properties — public_listing_consent. "not_asked" gets the
+  // same warning treatment as "no": neither one clears a property to show
+  // publicly, and the team should be able to spot both at a glance.
+  yes: "bg-[var(--sage-pale)] text-[var(--forest-deep)]",
+  no: "bg-[var(--error-bg)] text-[var(--error)]",
+  not_asked: "bg-[var(--error-bg)] text-[var(--error)]",
 }
 
 const DEFAULT_STYLE = "bg-[var(--warm-cream)] text-[var(--ink-soft)]"

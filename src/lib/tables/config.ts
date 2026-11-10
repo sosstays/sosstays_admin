@@ -474,6 +474,7 @@ const corporateStayProperties: TableConfig = {
   primaryKey: "id",
   listFields: [
     "submission_status",
+    "public_listing_consent",
     "property_name",
     "area",
     "county",
@@ -482,6 +483,7 @@ const corporateStayProperties: TableConfig = {
     "owner_name",
     "created_at",
   ],
+  badgeFields: ["submission_status", "public_listing_consent"],
   fields: [
     { key: "id", label: "ID", type: "uuid", editable: false },
     {

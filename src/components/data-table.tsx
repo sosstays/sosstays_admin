@@ -328,7 +328,7 @@ export function DataTable({ config, rows }: { config: TableConfig; rows: Row[] }
                   className="cursor-pointer border-t border-[var(--border-soft)] hover:bg-[var(--sage-pale)]"
                 >
                   {visibleKeys.map((key, index) => {
-                    const isStatus = key === "status"
+                    const isStatus = key === "status" || (config.badgeFields?.includes(key) ?? false)
                     const showAvatar = index === 0 && (config.avatarFields?.length ?? 0) > 0
 
                     return (

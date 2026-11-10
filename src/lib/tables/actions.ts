@@ -58,6 +58,24 @@ export async function updateRecord(
   let previous: Record<string, unknown> | null = null
   try {
     if (trackStage) previous = await getRow(tableKey, id)
+
+    // Approving a corporate stay property makes it eligible for the public
+    // carousel — refuse the flip unless the owner explicitly said "yes".
+    // "not_asked" is the default and is NOT consent; don't let a team
+    // member publish one with a single edit-form save.
+    if (tableKey === "corporate_stay_properties" && patch.submission_status === "approved") {
+      const consent =
+        typeof patch.public_listing_consent === "string"
+          ? patch.public_listing_consent
+          : ((previous ?? (await getRow(tableKey, id)))?.public_listing_consent as string | undefined)
+      if (consent !== "yes") {
+        return {
+          error:
+            "Can't approve: the owner hasn't given public_listing_consent = \"yes\" yet. Confirm with the owner first, or leave this pending/rejected.",
+        }
+      }
+    }
+
     await updateRow(tableKey, id, patch)
   } catch (err) {
     return { error: err instanceof Error ? err.message : "Failed to save changes." }
@@ -81,6 +99,17 @@ export async function createRecord(
 ): Promise<UpdateState> {
   const config = tableConfigs[tableKey]
   const data = parseFormData(config.fields, formData)
+
+  if (
+    tableKey === "corporate_stay_properties" &&
+    data.submission_status === "approved" &&
+    data.public_listing_consent !== "yes"
+  ) {
+    return {
+      error:
+        "Can't create as approved: the owner hasn't given public_listing_consent = \"yes\" yet. Create it as pending/rejected first.",
+    }
+  }
 
   let created
   try {

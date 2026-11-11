@@ -443,6 +443,7 @@ export type Database = {
           county: string | null
           created_at: string
           description: string | null
+          how_heard: string | null
           id: string
           listing_url: string | null
           max_guests_extended: number | null
@@ -469,6 +470,7 @@ export type Database = {
           county?: string | null
           created_at?: string
           description?: string | null
+          how_heard?: string | null
           id?: string
           listing_url?: string | null
           max_guests_extended?: number | null
@@ -495,6 +497,7 @@ export type Database = {
           county?: string | null
           created_at?: string
           description?: string | null
+          how_heard?: string | null
           id?: string
           listing_url?: string | null
           max_guests_extended?: number | null
@@ -722,6 +725,7 @@ export type Database = {
           estimated_potential: number | null
           estimated_uplift: number | null
           hours_per_week: number | null
+          how_heard: string | null
           id: string
           landlord_situation: string | null
           mailerlite_subscriber_id: string | null
@@ -754,6 +758,7 @@ export type Database = {
           estimated_potential?: number | null
           estimated_uplift?: number | null
           hours_per_week?: number | null
+          how_heard?: string | null
           id?: string
           landlord_situation?: string | null
           mailerlite_subscriber_id?: string | null
@@ -786,6 +791,7 @@ export type Database = {
           estimated_potential?: number | null
           estimated_uplift?: number | null
           hours_per_week?: number | null
+          how_heard?: string | null
           id?: string
           landlord_situation?: string | null
           mailerlite_subscriber_id?: string | null

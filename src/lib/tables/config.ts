@@ -217,7 +217,7 @@ const landlordLeads: TableConfig = {
   pluralLabel: "Landlord Leads",
   route: "/leads",
   primaryKey: "id",
-  listFields: ["name", "email", "phone", "status", "area", "current_revenue", "created_at"],
+  listFields: ["name", "email", "phone", "status", "area", "current_revenue", "how_heard", "created_at"],
   fields: [
     { key: "id", label: "ID", type: "uuid", editable: false },
     { key: "name", label: "Name", type: "text", editable: true },
@@ -232,6 +232,7 @@ const landlordLeads: TableConfig = {
       options: ["new", "contacted", "qualified", "converted", "declined"],
     },
     { key: "source", label: "Source", type: "text", editable: true },
+    { key: "how_heard", label: "How they heard about us", type: "text", editable: true },
     { key: "property_id", label: "Linked property", type: "uuid", editable: false },
     { key: "area", label: "Area", type: "text", editable: true },
     { key: "num_properties", label: "Number of properties", type: "text", editable: true },
@@ -282,7 +283,7 @@ const landlordLeads: TableConfig = {
   relations: [{ field: "property_id", targetTable: "properties", labelFields: ["name"] }],
   formGroups: [
     { label: "Contact", fields: ["name", "email", "phone", "company"] },
-    { label: "Lead status", fields: ["status", "source", "property_id"] },
+    { label: "Lead status", fields: ["status", "source", "how_heard", "property_id"] },
     { label: "Marketing consent", fields: ["marketing_consent", "marketing_consent_at"] },
     {
       label: "Property details",
@@ -529,6 +530,7 @@ const corporateStayProperties: TableConfig = {
     { key: "owner_name", label: "Owner name", type: "text", editable: true },
     { key: "owner_phone", label: "Owner phone", type: "text", editable: true },
     { key: "owner_email", label: "Owner email", type: "text", editable: true },
+    { key: "how_heard", label: "How they heard about us", type: "text", editable: true },
     { key: "notes", label: "Notes", type: "textarea", editable: true },
     { key: "created_at", label: "Created at", type: "datetime", editable: false },
     { key: "updated_at", label: "Updated at", type: "datetime", editable: false },
@@ -568,7 +570,7 @@ const corporateStayProperties: TableConfig = {
     },
     { label: "Details", fields: ["amenities", "description", "notes"] },
     { label: "Photos", fields: ["photo_urls", "photos_url"] },
-    { label: "Owner contact", fields: ["owner_name", "owner_phone", "owner_email"] },
+    { label: "Owner contact", fields: ["owner_name", "owner_phone", "owner_email", "how_heard"] },
     { label: "System", fields: ["id", "created_at", "updated_at"] },
   ],
 }

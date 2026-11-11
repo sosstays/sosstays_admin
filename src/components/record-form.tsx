@@ -11,6 +11,7 @@ import type { Row } from "@/lib/tables/queries"
 import { formatValue } from "@/lib/tables/format"
 import { deleteRecord, type UpdateState } from "@/lib/tables/actions"
 import { tableConfigs, type TableKey } from "@/lib/tables/config"
+import { PhotoManager } from "@/components/photo-manager"
 
 export function RecordForm({
   config,
@@ -62,6 +63,18 @@ export function RecordForm({
               "—"
             )}
           </p>
+        </div>
+      )
+    }
+
+    if (field.type === "photos") {
+      return (
+        <div key={field.key} className="flex flex-col gap-1.5 sm:col-span-2">
+          <Label>{field.label}</Label>
+          <PhotoManager
+            propertyId={String(row[config.primaryKey])}
+            initialUrls={Array.isArray(value) ? (value as string[]) : []}
+          />
         </div>
       )
     }

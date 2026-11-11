@@ -329,7 +329,9 @@ export function DataTable({ config, rows }: { config: TableConfig; rows: Row[] }
                 >
                   {visibleKeys.map((key, index) => {
                     const isStatus = key === "status" || (config.badgeFields?.includes(key) ?? false)
+                    const isPhotos = getField(config, key).type === "photos"
                     const showAvatar = index === 0 && (config.avatarFields?.length ?? 0) > 0
+                    const firstPhoto = isPhotos ? (row[key] as string[] | null)?.[0] : null
 
                     return (
                       <TableCell key={key} className="p-0">
@@ -342,7 +344,14 @@ export function DataTable({ config, rows }: { config: TableConfig; rows: Row[] }
                               {initials(row, config.avatarFields!)}
                             </span>
                           ) : null}
-                          {isStatus ? (
+                          {isPhotos ? (
+                            firstPhoto ? (
+                              // eslint-disable-next-line @next/next/no-img-element -- arbitrary Supabase Storage URL
+                              <img src={firstPhoto} alt="" className="h-9 w-9 rounded object-cover" />
+                            ) : (
+                              <span className="text-[var(--ink-soft)]">No photo</span>
+                            )
+                          ) : isStatus ? (
                             <StatusBadge status={row[key] as string | null} />
                           ) : (
                             cellText(row, key) || "—"

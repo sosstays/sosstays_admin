@@ -19,7 +19,10 @@ export function NewRecordForm({
   initialValues?: Record<string, string>
 }) {
   const [state, formAction, pending] = useActionState(action, {})
-  const editableFields = config.fields.filter((f) => f.editable)
+  // Photos need an existing property id (the Storage path is
+  // <bucket>/<propertyId>/...), so that field can't be filled in until
+  // after creation — managed from the detail page once the record exists.
+  const editableFields = config.fields.filter((f) => f.editable && f.type !== "photos")
 
   return (
     <form action={formAction} className="flex flex-col gap-6">

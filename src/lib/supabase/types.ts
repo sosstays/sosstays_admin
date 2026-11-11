@@ -451,6 +451,7 @@ export type Database = {
           owner_email: string | null
           owner_name: string | null
           owner_phone: string | null
+          photo_urls: string[]
           photos_url: string | null
           property_name: string
           public_listing_consent: string
@@ -476,6 +477,7 @@ export type Database = {
           owner_email?: string | null
           owner_name?: string | null
           owner_phone?: string | null
+          photo_urls?: string[]
           photos_url?: string | null
           property_name: string
           public_listing_consent?: string
@@ -501,6 +503,7 @@ export type Database = {
           owner_email?: string | null
           owner_name?: string | null
           owner_phone?: string | null
+          photo_urls?: string[]
           photos_url?: string | null
           property_name?: string
           public_listing_consent?: string

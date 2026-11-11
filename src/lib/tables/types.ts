@@ -8,6 +8,7 @@ export type FieldType =
   | "time"
   | "uuid"
   | "select"
+  | "photos"
 
 export interface FieldConfig {
   /** Column name in the underlying table. */

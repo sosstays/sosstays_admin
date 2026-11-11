@@ -5,6 +5,8 @@ import { redirect } from "next/navigation"
 import { tableConfigs, type TableKey } from "./config"
 import { updateRow, insertRow, deleteRow, getRow } from "./queries"
 import { recordActivity } from "@/lib/activities"
+import { uploadCorporateStayPhoto, deleteCorporateStayPhotoByUrl } from "./photoStorage"
+import { runCorporateStayPhotoBackfill, type BackfillPropertyResult } from "./corporateStayPhotoBackfill"
 import type { FieldConfig } from "./types"
 
 export interface UpdateState {
@@ -202,4 +204,87 @@ export async function setRowStatus(
   revalidatePath(`${config.route}/${id}`)
   revalidatePath(config.route)
   return { success: true }
+}
+
+export interface PhotoActionState {
+  error?: string
+  urls?: string[]
+}
+
+async function currentPhotoUrls(propertyId: string): Promise<string[]> {
+  const row = await getRow("corporate_stay_properties", propertyId)
+  return Array.isArray(row?.photo_urls) ? (row.photo_urls as string[]) : []
+}
+
+/**
+ * Uploads one or more photos (sent as "files" entries on the FormData) into
+ * corporate-stay-photos/<propertyId>/ and appends their public URLs to that
+ * property's photo_urls array.
+ */
+export async function addCorporateStayPhotos(
+  propertyId: string,
+  formData: FormData
+): Promise<PhotoActionState> {
+  const files = formData.getAll("files").filter((f): f is File => f instanceof File && f.size > 0)
+  if (files.length === 0) return { error: "Choose at least one photo." }
+
+  const uploaded: string[] = []
+  try {
+    for (const file of files) {
+      const buffer = Buffer.from(await file.arrayBuffer())
+      uploaded.push(
+        await uploadCorporateStayPhoto(propertyId, file.name, buffer, file.type || "image/jpeg")
+      )
+    }
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to upload photo." }
+  }
+
+  const next = [...(await currentPhotoUrls(propertyId)), ...uploaded]
+  await updateRow("corporate_stay_properties", propertyId, { photo_urls: next })
+  revalidatePath(`/corporate-stay-properties/${propertyId}`)
+  revalidatePath("/corporate-stay-properties")
+  return { urls: next }
+}
+
+/** Removes one photo from a property's photo_urls array and deletes its Storage object. */
+export async function removeCorporateStayPhoto(
+  propertyId: string,
+  url: string
+): Promise<PhotoActionState> {
+  const next = (await currentPhotoUrls(propertyId)).filter((u) => u !== url)
+  try {
+    await updateRow("corporate_stay_properties", propertyId, { photo_urls: next })
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to remove photo." }
+  }
+  await deleteCorporateStayPhotoByUrl(url)
+  revalidatePath(`/corporate-stay-properties/${propertyId}`)
+  revalidatePath("/corporate-stay-properties")
+  return { urls: next }
+}
+
+/** Sets a property's photo_urls to a new order (array order = display order). */
+export async function reorderCorporateStayPhotos(
+  propertyId: string,
+  urls: string[]
+): Promise<PhotoActionState> {
+  try {
+    await updateRow("corporate_stay_properties", propertyId, { photo_urls: urls })
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to reorder photos." }
+  }
+  revalidatePath(`/corporate-stay-properties/${propertyId}`)
+  return { urls }
+}
+
+/**
+ * One-off: runs the 2026-11-11 photo backfill for the 8 properties that
+ * launched with no photos (see corporateStayPhotoBackfill.ts). Safe to run
+ * more than once — it appends rather than replaces photo_urls.
+ */
+export async function runPhotoBackfill(): Promise<BackfillPropertyResult[]> {
+  const results = await runCorporateStayPhotoBackfill()
+  revalidatePath("/corporate-stay-properties")
+  return results
 }

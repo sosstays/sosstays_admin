@@ -8,7 +8,7 @@ import { LeadBoard } from "@/components/lead-board"
 import type { TableConfig } from "@/lib/tables/types"
 import type { Row } from "@/lib/tables/queries"
 
-/** The one pipeline shared by landlord_leads, partner_leads and corporate_leads (matches their DB check constraint). */
+/** The one pipeline shared by every lead table (landlord, partner, corporate, bespoke trip, gift maker). */
 export const PIPELINE_STAGES = ["new", "contacted", "qualified", "converted", "declined"]
 
 /**

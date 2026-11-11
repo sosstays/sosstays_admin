@@ -261,10 +261,12 @@ const landlordLeads: TableConfig = {
     { key: "marketing_consent", label: "Marketing consent", type: "boolean", editable: false },
     {
       key: "marketing_consent_at",
-      label: "Consent given at",
+      label: "Marketing consent given at",
       type: "datetime",
       editable: false,
     },
+    { key: "consent", label: "Agreed to Privacy Policy", type: "boolean", editable: false },
+    { key: "consent_at", label: "Privacy Policy agreed at", type: "datetime", editable: false },
     {
       key: "mailerlite_subscriber_id",
       label: "MailerLite subscriber ID",
@@ -284,7 +286,10 @@ const landlordLeads: TableConfig = {
   formGroups: [
     { label: "Contact", fields: ["name", "email", "phone", "company"] },
     { label: "Lead status", fields: ["status", "source", "how_heard", "property_id"] },
-    { label: "Marketing consent", fields: ["marketing_consent", "marketing_consent_at"] },
+    {
+      label: "Consent",
+      fields: ["consent", "consent_at", "marketing_consent", "marketing_consent_at"],
+    },
     {
       label: "Property details",
       fields: [
@@ -328,20 +333,35 @@ const contactQueries: TableConfig = {
   pluralLabel: "Contact Queries",
   route: "/contact-queries",
   primaryKey: "id",
-  listFields: ["name", "email", "topic", "status", "created_at"],
+  listFields: ["name", "email", "phone", "topic", "status", "created_at"],
   fields: [
     { key: "id", label: "ID", type: "uuid", editable: false },
     { key: "name", label: "Name", type: "text", editable: true },
     { key: "email", label: "Email", type: "text", editable: true },
+    { key: "phone", label: "Phone", type: "text", editable: true },
     {
       key: "topic",
       label: "Topic",
       type: "select",
       editable: true,
-      options: ["Media query", "About a booking", "Hiring", "Partnership", "Other"],
+      // Must match the CHECK constraint on contact_queries.topic (and the
+      // website contact form's dropdown).
+      options: [
+        "About a booking",
+        "I have a property to manage",
+        "Partner outreach",
+        "Add to shop",
+        "Media query",
+        "Events",
+        "Speaking request",
+        "Other",
+      ],
     },
     { key: "property_name", label: "Property name", type: "text", editable: true },
     { key: "message", label: "Message", type: "textarea", editable: true },
+    { key: "how_heard", label: "How they heard about us", type: "text", editable: true },
+    { key: "consent", label: "Agreed to Privacy Policy", type: "boolean", editable: false },
+    { key: "consent_at", label: "Privacy Policy agreed at", type: "datetime", editable: false },
     {
       key: "status",
       label: "Status",
@@ -365,8 +385,12 @@ const contactQueries: TableConfig = {
     { key: "updated_at", label: "Updated at", type: "datetime", editable: false },
   ],
   formGroups: [
-    { label: "Query", fields: ["name", "email", "topic", "property_name", "message"] },
+    {
+      label: "Query",
+      fields: ["name", "email", "phone", "topic", "property_name", "message", "how_heard"],
+    },
     { label: "Status", fields: ["status"] },
+    { label: "Consent", fields: ["consent", "consent_at"] },
     {
       label: "System",
       fields: [
@@ -397,6 +421,11 @@ const mailerliteFields = [
   },
 ] as const satisfies FieldConfig[]
 
+const consentFields = [
+  { key: "consent", label: "Agreed to Privacy Policy", type: "boolean", editable: false },
+  { key: "consent_at", label: "Privacy Policy agreed at", type: "datetime", editable: false },
+] as const satisfies FieldConfig[]
+
 const systemFields = [
   { key: "created_at", label: "Created at", type: "datetime", editable: false },
   { key: "updated_at", label: "Updated at", type: "datetime", editable: false },
@@ -421,6 +450,7 @@ const partnerLeads: TableConfig = {
     { key: "about_business", label: "About the business", type: "textarea", editable: true },
     { key: "referral", label: "How they heard about us", type: "text", editable: true },
     { key: "status", label: "Status", type: "select", editable: true, options: LEAD_STATUSES },
+    ...consentFields,
     ...mailerliteFields,
     ...systemFields,
   ],
@@ -428,6 +458,7 @@ const partnerLeads: TableConfig = {
     { label: "Contact", fields: ["business_name", "contact_name", "email", "phone", "website"] },
     { label: "Business", fields: ["category", "location", "about_business", "referral"] },
     { label: "Lead status", fields: ["status"] },
+    { label: "Consent", fields: ["consent", "consent_at"] },
     {
       label: "System",
       fields: ["id", "mailerlite_subscriber_id", "mailerlite_synced_at", "created_at", "updated_at"],
@@ -449,17 +480,40 @@ const corporateLeads: TableConfig = {
     { key: "email", label: "Email", type: "text", editable: true },
     { key: "phone", label: "Phone", type: "text", editable: true },
     { key: "location_needed", label: "Location needed", type: "text", editable: true },
+    { key: "location_preference", label: "Location preference", type: "text", editable: true },
     { key: "number_of_workers", label: "Number of workers", type: "text", editable: true },
+    { key: "room_preference", label: "Room preference", type: "text", editable: true },
+    { key: "start_date", label: "Start date", type: "date", editable: true },
+    { key: "end_date", label: "End date", type: "date", editable: true },
     { key: "duration", label: "Duration", type: "text", editable: true },
+    { key: "schedule_preference", label: "Schedule preference", type: "text", editable: true },
+    { key: "other_requirements", label: "Other requirements", type: "textarea", editable: true },
     { key: "message", label: "Message", type: "textarea", editable: true },
+    { key: "how_heard", label: "How they heard about us", type: "text", editable: true },
     { key: "status", label: "Status", type: "select", editable: true, options: LEAD_STATUSES },
+    ...consentFields,
     ...mailerliteFields,
     ...systemFields,
   ],
   formGroups: [
     { label: "Contact", fields: ["name", "company", "email", "phone"] },
-    { label: "Requirement", fields: ["location_needed", "number_of_workers", "duration", "message"] },
-    { label: "Lead status", fields: ["status"] },
+    {
+      label: "Requirement",
+      fields: [
+        "location_needed",
+        "location_preference",
+        "number_of_workers",
+        "room_preference",
+        "start_date",
+        "end_date",
+        "duration",
+        "schedule_preference",
+        "other_requirements",
+        "message",
+      ],
+    },
+    { label: "Lead status", fields: ["status", "how_heard"] },
+    { label: "Consent", fields: ["consent", "consent_at"] },
     {
       label: "System",
       fields: ["id", "mailerlite_subscriber_id", "mailerlite_synced_at", "created_at", "updated_at"],
@@ -652,6 +706,7 @@ const corporateStayQuotes: TableConfig = {
       options: ["quoted", "confirmed", "declined", "expired"],
     },
     { key: "source_contact", label: "Source contact", type: "text", editable: true },
+    { key: "captured_by", label: "Captured by", type: "text", editable: true },
     { key: "notes", label: "Notes", type: "textarea", editable: true },
     { key: "created_at", label: "Created at", type: "datetime", editable: false },
     { key: "updated_at", label: "Updated at", type: "datetime", editable: false },
@@ -687,8 +742,208 @@ const corporateStayQuotes: TableConfig = {
         "client_price_eur",
       ],
     },
-    { label: "Status", fields: ["booking_channel", "status", "source_contact", "notes"] },
+    { label: "Status", fields: ["booking_channel", "status", "source_contact", "captured_by", "notes"] },
     { label: "System", fields: ["id", "created_at", "updated_at"] },
+  ],
+}
+
+// Website form: /bespoke-ireland-trip (api/bespoke-trip-lead). One row per
+// email — a resubmission updates the same row.
+const bespokeTripLeads: TableConfig = {
+  key: "bespoke_trip_leads",
+  label: "Bespoke Trip Lead",
+  pluralLabel: "Bespoke Trip Leads",
+  route: "/bespoke-trip-leads",
+  primaryKey: "id",
+  listFields: ["name", "email", "phone", "ideal_month", "group_size", "status", "created_at"],
+  fields: [
+    { key: "id", label: "ID", type: "uuid", editable: false },
+    { key: "name", label: "Name", type: "text", editable: true },
+    { key: "email", label: "Email", type: "text", editable: true },
+    { key: "phone", label: "Phone", type: "text", editable: true },
+    { key: "ideal_month", label: "Ideal month", type: "text", editable: true },
+    { key: "event_type", label: "Coming for an event?", type: "text", editable: true },
+    { key: "group_size", label: "Group size", type: "text", editable: true },
+    {
+      key: "accommodation_preference",
+      label: "Accommodation preference",
+      type: "text",
+      editable: true,
+    },
+    { key: "interests", label: "Interests", type: "textarea", editable: true },
+    { key: "base_or_route", label: "One base or a route", type: "text", editable: true },
+    { key: "notes", label: "Notes", type: "textarea", editable: true },
+    { key: "how_heard", label: "How they heard about us", type: "text", editable: true },
+    { key: "source", label: "Source", type: "text", editable: true },
+    { key: "status", label: "Status", type: "select", editable: true, options: LEAD_STATUSES },
+    ...consentFields,
+    ...mailerliteFields,
+    ...systemFields,
+  ],
+  formGroups: [
+    { label: "Contact", fields: ["name", "email", "phone"] },
+    {
+      label: "Trip",
+      fields: [
+        "ideal_month",
+        "event_type",
+        "group_size",
+        "accommodation_preference",
+        "interests",
+        "base_or_route",
+        "notes",
+      ],
+    },
+    { label: "Lead status", fields: ["status", "source", "how_heard"] },
+    { label: "Consent", fields: ["consent", "consent_at"] },
+    {
+      label: "System",
+      fields: ["id", "mailerlite_subscriber_id", "mailerlite_synced_at", "created_at", "updated_at"],
+    },
+  ],
+}
+
+// Website form: /gift-maker quote wizard (api/gift-maker-lead). Every quote
+// request is its own row, even from a returning email.
+const giftMakerLeads: TableConfig = {
+  key: "gift_maker_leads",
+  label: "Gift Maker Lead",
+  pluralLabel: "Gift Maker Leads",
+  route: "/gift-maker-leads",
+  primaryKey: "id",
+  listFields: [
+    "name",
+    "email",
+    "phone",
+    "billing_type",
+    "quantity",
+    "package_label",
+    "package_total",
+    "status",
+    "created_at",
+  ],
+  fields: [
+    { key: "id", label: "ID", type: "uuid", editable: false },
+    { key: "name", label: "Name", type: "text", editable: true },
+    { key: "email", label: "Email", type: "text", editable: true },
+    { key: "phone", label: "Phone", type: "text", editable: true },
+    {
+      key: "billing_type",
+      label: "Billing type",
+      type: "select",
+      editable: true,
+      options: ["business", "personal"],
+    },
+    { key: "recipient_type", label: "Who the gifts are for", type: "text", editable: true },
+    { key: "quantity", label: "Quantity", type: "text", editable: true },
+    { key: "budget_per_gift", label: "Budget per gift (EUR)", type: "number", editable: true },
+    { key: "format", label: "Format", type: "text", editable: true },
+    { key: "delivery_method", label: "Delivery method", type: "text", editable: true },
+    { key: "package_label", label: "Package", type: "text", editable: true },
+    { key: "package_items", label: "Package items", type: "textarea", editable: true },
+    { key: "package_total", label: "Package total (EUR)", type: "number", editable: true },
+    { key: "how_heard", label: "How they heard about us", type: "text", editable: true },
+    { key: "status", label: "Status", type: "select", editable: true, options: LEAD_STATUSES },
+    ...consentFields,
+    ...mailerliteFields,
+    ...systemFields,
+  ],
+  formGroups: [
+    { label: "Contact", fields: ["name", "email", "phone", "billing_type"] },
+    {
+      label: "Gift brief",
+      fields: ["recipient_type", "quantity", "budget_per_gift", "format", "delivery_method"],
+    },
+    { label: "Package", fields: ["package_label", "package_items", "package_total"] },
+    { label: "Lead status", fields: ["status", "how_heard"] },
+    { label: "Consent", fields: ["consent", "consent_at"] },
+    {
+      label: "System",
+      fields: ["id", "mailerlite_subscriber_id", "mailerlite_synced_at", "created_at", "updated_at"],
+    },
+  ],
+}
+
+// Website /shop checkout. Rows are written by the Stripe webhook once a
+// payment succeeds, so everything except fulfilment is read-only here.
+const shopOrders: TableConfig = {
+  key: "shop_orders",
+  label: "Shop Order",
+  pluralLabel: "Shop Orders",
+  route: "/shop-orders",
+  primaryKey: "id",
+  listFields: [
+    "product_name",
+    "quantity",
+    "amount_total",
+    "buyer_name",
+    "buyer_email",
+    "delivery_method",
+    "fulfilment_status",
+    "created_at",
+  ],
+  badgeFields: ["fulfilment_status"],
+  fields: [
+    { key: "id", label: "ID", type: "uuid", editable: false },
+    {
+      key: "fulfilment_status",
+      label: "Fulfilment status",
+      type: "select",
+      editable: true,
+      options: ["new", "in_progress", "fulfilled", "cancelled"],
+    },
+    { key: "product_name", label: "Product", type: "text", editable: false },
+    { key: "product_kind", label: "Product kind", type: "text", editable: false },
+    { key: "product_id", label: "Product ID", type: "text", editable: false },
+    { key: "quantity", label: "Quantity", type: "text", editable: false },
+    { key: "amount_total", label: "Amount paid (cents)", type: "text", editable: false },
+    { key: "currency", label: "Currency", type: "text", editable: false },
+    { key: "buyer_name", label: "Buyer name", type: "text", editable: false },
+    { key: "buyer_email", label: "Buyer email", type: "text", editable: false },
+    { key: "buyer_phone", label: "Buyer phone", type: "text", editable: false },
+    { key: "recipient_name", label: "Recipient name", type: "text", editable: true },
+    { key: "recipient_email", label: "Recipient email", type: "text", editable: true },
+    { key: "gift_note", label: "Gift note", type: "textarea", editable: true },
+    { key: "delivery_method", label: "Delivery method", type: "text", editable: false },
+    { key: "delivery_address", label: "Delivery address", type: "textarea", editable: true },
+    { key: "delivery_postcode", label: "Delivery postcode", type: "text", editable: true },
+    { key: "property_name", label: "Deliver to property", type: "text", editable: false },
+    { key: "property_slug", label: "Property slug", type: "text", editable: false },
+    { key: "arrival_date", label: "Stay date", type: "date", editable: true },
+    { key: "stay_date_type", label: "Stay date is", type: "text", editable: false },
+    {
+      key: "stripe_payment_intent_id",
+      label: "Stripe PaymentIntent ID",
+      type: "text",
+      editable: false,
+    },
+    { key: "receipt_sent_at", label: "Receipt sent at", type: "datetime", editable: false },
+    ...systemFields,
+  ],
+  formGroups: [
+    { label: "Fulfilment", fields: ["fulfilment_status"] },
+    {
+      label: "Order",
+      fields: ["product_name", "product_kind", "product_id", "quantity", "amount_total", "currency"],
+    },
+    { label: "Buyer", fields: ["buyer_name", "buyer_email", "buyer_phone"] },
+    { label: "Recipient", fields: ["recipient_name", "recipient_email", "gift_note"] },
+    {
+      label: "Delivery",
+      fields: [
+        "delivery_method",
+        "delivery_address",
+        "delivery_postcode",
+        "property_name",
+        "property_slug",
+        "arrival_date",
+        "stay_date_type",
+      ],
+    },
+    {
+      label: "System",
+      fields: ["id", "stripe_payment_intent_id", "receipt_sent_at", "created_at", "updated_at"],
+    },
   ],
 }
 
@@ -768,6 +1023,9 @@ export const tableConfigs = {
   corporate_leads: corporateLeads,
   corporate_stay_properties: corporateStayProperties,
   corporate_stay_quotes: corporateStayQuotes,
+  bespoke_trip_leads: bespokeTripLeads,
+  gift_maker_leads: giftMakerLeads,
+  shop_orders: shopOrders,
   newsletter_subscribers: newsletterSubscribers,
   concierge_signups: conciergeSignups,
 } satisfies Record<string, TableConfig>

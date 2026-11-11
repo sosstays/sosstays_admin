@@ -172,7 +172,13 @@ async function logStageChange(
   }
 }
 
-const PIPELINE_TABLES = new Set<string>(["landlord_leads", "partner_leads", "corporate_leads"])
+const PIPELINE_TABLES = new Set<string>([
+  "landlord_leads",
+  "partner_leads",
+  "corporate_leads",
+  "bespoke_trip_leads",
+  "gift_maker_leads",
+])
 const PIPELINE_STAGES = ["new", "contacted", "qualified", "converted", "declined"]
 
 /**

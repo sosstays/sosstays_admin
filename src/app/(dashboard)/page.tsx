@@ -11,6 +11,9 @@ import {
   ArrowRight,
   MapPinned,
   Receipt,
+  Compass,
+  Gift,
+  ShoppingBag,
 } from "lucide-react"
 import { countRows, countPendingCorporateStaySubmissions, listRows } from "@/lib/tables/queries"
 import { formatValue } from "@/lib/tables/format"
@@ -27,6 +30,9 @@ const STAT_ICONS = {
   corporate_leads: Briefcase,
   corporate_stay_properties: MapPinned,
   corporate_stay_quotes: Receipt,
+  bespoke_trip_leads: Compass,
+  gift_maker_leads: Gift,
+  shop_orders: ShoppingBag,
   newsletter_subscribers: Mail,
 } as const
 
@@ -41,6 +47,9 @@ export default async function DashboardHomePage() {
     corporateCount,
     corporateStayPropertyCount,
     corporateStayQuoteCount,
+    bespokeTripCount,
+    giftMakerCount,
+    shopOrderCount,
     subscriberCount,
     pendingCorporateStaySubmissions,
     recentBookings,
@@ -54,6 +63,9 @@ export default async function DashboardHomePage() {
     countRows("corporate_leads"),
     countRows("corporate_stay_properties"),
     countRows("corporate_stay_quotes"),
+    countRows("bespoke_trip_leads"),
+    countRows("gift_maker_leads"),
+    countRows("shop_orders"),
     countRows("newsletter_subscribers"),
     countPendingCorporateStaySubmissions(),
     listRows("bookings"),
@@ -112,6 +124,19 @@ export default async function DashboardHomePage() {
           count={corporateStayQuoteCount}
           statKey="corporate_stay_quotes"
         />
+        <StatCard
+          href="/bespoke-trip-leads"
+          label="Bespoke Trip Leads"
+          count={bespokeTripCount}
+          statKey="bespoke_trip_leads"
+        />
+        <StatCard
+          href="/gift-maker-leads"
+          label="Gift Maker Leads"
+          count={giftMakerCount}
+          statKey="gift_maker_leads"
+        />
+        <StatCard href="/shop-orders" label="Shop Orders" count={shopOrderCount} statKey="shop_orders" />
         <StatCard
           href="/newsletter"
           label="Newsletter Subscribers"

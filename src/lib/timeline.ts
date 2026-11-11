@@ -54,6 +54,8 @@ const LEAD_LABELS: Partial<Record<TableKey, string>> = {
   landlord_leads: "Landlord lead",
   partner_leads: "Partner lead",
   corporate_leads: "Corporate lead",
+  bespoke_trip_leads: "Bespoke trip request",
+  gift_maker_leads: "Gift maker quote request",
 }
 
 function str(value: unknown): string | null {
@@ -119,7 +121,9 @@ export function buildTimeline(
           break
         case "landlord_leads":
         case "partner_leads":
-        case "corporate_leads": {
+        case "corporate_leads":
+        case "bespoke_trip_leads":
+        case "gift_maker_leads": {
           const label = LEAD_LABELS[table]!
           const status = str(row.status)
           add(table, row, "created_at", "lead", `${label} submitted`, status && `Status now: ${status}`)

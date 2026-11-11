@@ -32,6 +32,16 @@ const SECTIONS: { table: TableKey; label: string; columns: string[] }[] = [
     columns: ["name", "company", "status", "number_of_workers", "created_at"],
   },
   {
+    table: "bespoke_trip_leads",
+    label: "Bespoke trip requests",
+    columns: ["name", "status", "ideal_month", "group_size", "created_at"],
+  },
+  {
+    table: "gift_maker_leads",
+    label: "Gift maker quote requests",
+    columns: ["name", "status", "quantity", "package_label", "package_total", "created_at"],
+  },
+  {
     table: "contact_queries",
     label: "Contact messages",
     columns: ["topic", "status", "message", "created_at"],

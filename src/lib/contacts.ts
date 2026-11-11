@@ -119,6 +119,8 @@ export const ROLE_LABELS: Record<string, string> = {
   landlord: "Landlord",
   partner: "Partner",
   corporate: "Corporate",
+  bespoke_trip: "Bespoke trip",
+  gift_maker: "Gift maker",
   enquirer: "Enquirer",
   newsletter: "Newsletter",
 }

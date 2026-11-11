@@ -17,6 +17,9 @@ import {
   LogOut,
   MapPinned,
   Receipt,
+  Compass,
+  Gift,
+  ShoppingBag,
 } from "lucide-react"
 import { logout } from "@/lib/auth/actions"
 import { Logo } from "@/components/logo"
@@ -42,6 +45,9 @@ const links = [
   { href: "/corporate-leads", label: "Corporate Leads", icon: Briefcase },
   { href: "/corporate-stay-properties", label: "Corporate Stay Properties", icon: MapPinned },
   { href: "/corporate-stay-quotes", label: "Corporate Stay Quotes", icon: Receipt },
+  { href: "/bespoke-trip-leads", label: "Bespoke Trip Leads", icon: Compass },
+  { href: "/gift-maker-leads", label: "Gift Maker Leads", icon: Gift },
+  { href: "/shop-orders", label: "Shop Orders", icon: ShoppingBag },
   { href: "/contact-queries", label: "Contact Queries", icon: MessageSquare },
   { href: "/newsletter", label: "Newsletter", icon: Mail },
 ]

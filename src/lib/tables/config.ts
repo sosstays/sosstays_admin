@@ -585,6 +585,12 @@ const corporateStayProperties: TableConfig = {
     { key: "owner_phone", label: "Owner phone", type: "text", editable: true },
     { key: "owner_email", label: "Owner email", type: "text", editable: true },
     { key: "how_heard", label: "How they heard about us", type: "text", editable: true },
+    {
+      key: "wants_management_info",
+      label: "Wants to talk about property management",
+      type: "boolean",
+      editable: true,
+    },
     { key: "notes", label: "Notes", type: "textarea", editable: true },
     { key: "created_at", label: "Created at", type: "datetime", editable: false },
     { key: "updated_at", label: "Updated at", type: "datetime", editable: false },
@@ -624,7 +630,10 @@ const corporateStayProperties: TableConfig = {
     },
     { label: "Details", fields: ["amenities", "description", "notes"] },
     { label: "Photos", fields: ["photo_urls", "photos_url"] },
-    { label: "Owner contact", fields: ["owner_name", "owner_phone", "owner_email", "how_heard"] },
+    {
+      label: "Owner contact",
+      fields: ["owner_name", "owner_phone", "owner_email", "how_heard", "wants_management_info"],
+    },
     { label: "System", fields: ["id", "created_at", "updated_at"] },
   ],
 }
